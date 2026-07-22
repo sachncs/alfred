@@ -37,9 +37,9 @@ func TestFileSessionStoreAppendMultipleTimes(t *testing.T) {
 	dir := t.TempDir()
 	s, _ := NewFileSessionStore(dir)
 
-	s.Append("thr1", []contract.TurnItem{{ID: "e1"}})
-	s.Append("thr1", []contract.TurnItem{{ID: "e2"}})
-	s.Append("thr1", []contract.TurnItem{{ID: "e3"}})
+	_ = s.Append("thr1", []contract.TurnItem{{ID: "e1"}})
+	_ = s.Append("thr1", []contract.TurnItem{{ID: "e2"}})
+	_ = s.Append("thr1", []contract.TurnItem{{ID: "e3"}})
 
 	got, _ := s.Read("thr1", 0)
 	if len(got) != 3 {
@@ -51,7 +51,7 @@ func TestFileSessionStoreReadWithOffset(t *testing.T) {
 	dir := t.TempDir()
 	s, _ := NewFileSessionStore(dir)
 
-	s.Append("thr1", []contract.TurnItem{
+	_ = s.Append("thr1", []contract.TurnItem{
 		{ID: "e1"}, {ID: "e2"}, {ID: "e3"},
 	})
 
@@ -82,7 +82,7 @@ func TestFileSessionStorePrune(t *testing.T) {
 	s, _ := NewFileSessionStore(dir)
 
 	for i := 0; i < 10; i++ {
-		s.Append("thr1", []contract.TurnItem{{ID: contract.ItemID("e" + string(rune('0'+i)))}})
+		_ = s.Append("thr1", []contract.TurnItem{{ID: contract.ItemID("e" + string(rune('0'+i)))}})
 	}
 
 	if err := s.Prune("thr1", 3); err != nil {
@@ -102,7 +102,7 @@ func TestFileSessionStorePruneNoop(t *testing.T) {
 	dir := t.TempDir()
 	s, _ := NewFileSessionStore(dir)
 
-	s.Append("thr1", []contract.TurnItem{{ID: "e1"}})
+	_ = s.Append("thr1", []contract.TurnItem{{ID: "e1"}})
 	if err := s.Prune("thr1", 10); err != nil {
 		t.Fatal(err)
 	}

@@ -12,9 +12,9 @@ import (
 
 func TestFindToolBasic(t *testing.T) {
 	dir := t.TempDir()
-	os.WriteFile(filepath.Join(dir, "a.go"), []byte("package main"), 0o644)
-	os.WriteFile(filepath.Join(dir, "b.txt"), []byte("hello"), 0o644)
-	os.WriteFile(filepath.Join(dir, "c.go"), []byte("package main"), 0o644)
+	_ = os.WriteFile(filepath.Join(dir, "a.go"), []byte("package main"), 0o644)
+	_ = os.WriteFile(filepath.Join(dir, "b.txt"), []byte("hello"), 0o644)
+	_ = os.WriteFile(filepath.Join(dir, "c.go"), []byte("package main"), 0o644)
 
 	ft := NewFindTool()
 	tc := tool.NewContext(context.Background(), "", "", "", dir)
@@ -29,7 +29,7 @@ func TestFindToolBasic(t *testing.T) {
 	}
 
 	var out FindOutput
-	json.Unmarshal(res.Structured, &out)
+	_ = json.Unmarshal(res.Structured, &out)
 	if out.Count != 2 {
 		t.Errorf("count = %d, want 2", out.Count)
 	}
@@ -37,9 +37,9 @@ func TestFindToolBasic(t *testing.T) {
 
 func TestFindToolSkipsGit(t *testing.T) {
 	dir := t.TempDir()
-	os.MkdirAll(filepath.Join(dir, ".git"), 0o755)
-	os.WriteFile(filepath.Join(dir, ".git", "config"), []byte("data"), 0o644)
-	os.WriteFile(filepath.Join(dir, "a.txt"), []byte("data"), 0o644)
+	_ = os.MkdirAll(filepath.Join(dir, ".git"), 0o755)
+	_ = os.WriteFile(filepath.Join(dir, ".git", "config"), []byte("data"), 0o644)
+	_ = os.WriteFile(filepath.Join(dir, "a.txt"), []byte("data"), 0o644)
 
 	ft := NewFindTool()
 	tc := tool.NewContext(context.Background(), "", "", "", dir)
@@ -48,7 +48,7 @@ func TestFindToolSkipsGit(t *testing.T) {
 	res, _ := ft.Execute(context.Background(), input, tc)
 
 	var out FindOutput
-	json.Unmarshal(res.Structured, &out)
+	_ = json.Unmarshal(res.Structured, &out)
 	if out.Count != 1 {
 		t.Errorf("count = %d, want 1 (skip .git)", out.Count)
 	}
@@ -56,7 +56,7 @@ func TestFindToolSkipsGit(t *testing.T) {
 
 func TestFindToolNoMatches(t *testing.T) {
 	dir := t.TempDir()
-	os.WriteFile(filepath.Join(dir, "a.txt"), []byte("data"), 0o644)
+	_ = os.WriteFile(filepath.Join(dir, "a.txt"), []byte("data"), 0o644)
 
 	ft := NewFindTool()
 	tc := tool.NewContext(context.Background(), "", "", "", dir)
@@ -65,7 +65,7 @@ func TestFindToolNoMatches(t *testing.T) {
 	res, _ := ft.Execute(context.Background(), input, tc)
 
 	var out FindOutput
-	json.Unmarshal(res.Structured, &out)
+	_ = json.Unmarshal(res.Structured, &out)
 	if out.Count != 0 {
 		t.Errorf("count = %d, want 0", out.Count)
 	}

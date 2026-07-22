@@ -6,16 +6,16 @@ import (
 
 // Instruction is a pending steering instruction.
 type Instruction struct {
-	ID      string
-	Text    string
+	ID       string
+	Text     string
 	Priority int
 }
 
 // SteeringQueue manages pending steering instructions for the agent.
 type SteeringQueue struct {
-	mu   sync.Mutex
+	mu           sync.Mutex
 	instructions []Instruction
-	counter int
+	counter      int
 }
 
 // NewSteeringQueue creates a new queue.
@@ -28,7 +28,7 @@ func (q *SteeringQueue) Push(text string, priority int) string {
 	q.mu.Lock()
 	defer q.mu.Unlock()
 	q.counter++
-	id := string(rune('A'-1+q.counter)) // ponytail: simple A,B,C... IDs
+	id := string(rune('A' - 1 + q.counter)) // ponytail: simple A,B,C... IDs
 	q.instructions = append(q.instructions, Instruction{
 		ID: id, Text: text, Priority: priority,
 	})

@@ -6,9 +6,9 @@ import (
 
 // TokenBudget tracks token usage and enforces limits.
 type TokenBudget struct {
-	maxInput  int
-	maxOutput int
-	inputUsed int
+	maxInput   int
+	maxOutput  int
+	inputUsed  int
 	outputUsed int
 }
 

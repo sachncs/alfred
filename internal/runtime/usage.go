@@ -7,17 +7,17 @@ import (
 
 // UsageRecord tracks a single token usage event.
 type UsageRecord struct {
-	Timestamp   time.Time
-	Model       string
-	InputTokens int
+	Timestamp    time.Time
+	Model        string
+	InputTokens  int
 	OutputTokens int
 }
 
 // UsageTracker aggregates usage across turns.
 type UsageTracker struct {
-	mu      sync.Mutex
-	records []UsageRecord
-	totalIn int
+	mu       sync.Mutex
+	records  []UsageRecord
+	totalIn  int
 	totalOut int
 }
 
@@ -31,9 +31,9 @@ func (t *UsageTracker) Record(model string, inputTokens, outputTokens int) {
 	t.mu.Lock()
 	defer t.mu.Unlock()
 	t.records = append(t.records, UsageRecord{
-		Timestamp: time.Now().UTC(),
-		Model: model,
-		InputTokens: inputTokens,
+		Timestamp:    time.Now().UTC(),
+		Model:        model,
+		InputTokens:  inputTokens,
 		OutputTokens: outputTokens,
 	})
 	t.totalIn += inputTokens

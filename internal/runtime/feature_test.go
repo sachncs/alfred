@@ -278,7 +278,10 @@ func TestSummaryCount(t *testing.T) {
 }
 
 func TestItoa(t *testing.T) {
-	tests := []struct{ in int; want string }{
+	tests := []struct {
+		in   int
+		want string
+	}{
 		{0, "0"}, {1, "1"}, {42, "42"}, {123, "123"},
 	}
 	for _, tt := range tests {

@@ -12,10 +12,10 @@ import (
 
 // EditInput is the JSON schema for EditTool input.
 type EditInput struct {
-	Path    string `json:"path"`
-	Old     string `json:"old"`
-	New     string `json:"new"`
-	Fuzzy   bool   `json:"fuzzy,omitempty"`
+	Path  string `json:"path"`
+	Old   string `json:"old"`
+	New   string `json:"new"`
+	Fuzzy bool   `json:"fuzzy,omitempty"`
 }
 
 // EditOutput is the structured payload returned by EditTool.
@@ -96,7 +96,7 @@ func (t *EditTool) Execute(ctx context.Context, raw json.RawMessage, tc *tool.Co
 
 	// Check for multiple matches.
 	rest := content[idx+len(oldText):]
-	if strings.Index(rest, oldText) != -1 {
+	if strings.Contains(rest, oldText) {
 		return tool.FailureMsg(fmt.Sprintf("multiple matches found in %s — provide more context", in.Path)), nil
 	}
 

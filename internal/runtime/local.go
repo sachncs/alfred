@@ -19,7 +19,7 @@ func NewLocalRuntime(bearerToken string, ts ThreadStore, ss SessionStore) *Local
 }
 
 func (r *LocalRuntime) setupV1Routes() {
-	mux := r.HTTPRuntime.mux
+	mux := r.mux
 
 	// Threads
 	mux.HandleFunc("GET /v1/threads", r.handleListThreads)

@@ -97,14 +97,6 @@ func (t *WriteTool) Execute(ctx context.Context, raw json.RawMessage, tc *tool.C
 	return tool.SuccessWith(fmt.Sprintf("wrote %d bytes to %s", out.Size, in.Path), out), nil
 }
 
-// normalizeContent handles BOM stripping and line ending normalization.
-// Exported for testing.
-func normalizeContent(s string) string {
-	s = strings.TrimPrefix(s, "\xEF\xBB\xBF")
-	s = strings.ReplaceAll(s, "\r\n", "\n")
-	return s
-}
-
 // hasBOM checks if a byte slice starts with UTF-8 BOM.
 func hasBOM(data []byte) bool {
 	return bytes.HasPrefix(data, []byte{0xEF, 0xBB, 0xBF})

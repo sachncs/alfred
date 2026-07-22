@@ -71,7 +71,7 @@ func TestFileThreadStoreList(t *testing.T) {
 	for i := 0; i < 5; i++ {
 		th := newFixtureThread("t" + string(rune('0'+i)))
 		th.CreatedAt = time.Now().UTC().Add(time.Duration(i) * time.Second)
-		s.Create(th)
+		_ = s.Create(th)
 	}
 
 	threads, _, err := s.List(3, "")
@@ -88,7 +88,7 @@ func TestFileThreadStoreUpdate(t *testing.T) {
 	s, _ := NewFileThreadStore(dir)
 
 	th := newFixtureThread("t1")
-	s.Create(th)
+	_ = s.Create(th)
 
 	th.Title = "updated"
 	th.Status = contract.ThreadStatusRunning
@@ -110,7 +110,7 @@ func TestFileThreadStoreDelete(t *testing.T) {
 	s, _ := NewFileThreadStore(dir)
 
 	th := newFixtureThread("t1")
-	s.Create(th)
+	_ = s.Create(th)
 
 	if err := s.Delete("t1"); err != nil {
 		t.Fatal(err)
@@ -142,7 +142,7 @@ func TestFileThreadStoreConcurrentWrites(t *testing.T) {
 			defer wg.Done()
 			id := contract.ThreadID("t" + string(rune('A'+i%26)))
 			th := newFixtureThread(string(id))
-			s.Create(th)
+			_ = s.Create(th)
 		}(i)
 	}
 	wg.Wait()

@@ -40,7 +40,7 @@ func (s *FileSessionStore) Append(threadID contract.ThreadID, events []contract.
 	if err != nil {
 		return err
 	}
-	defer f.Close()
+	defer func() { _ = f.Close() }()
 
 	enc := json.NewEncoder(f)
 	for _, ev := range events {
@@ -64,7 +64,7 @@ func (s *FileSessionStore) Read(threadID contract.ThreadID, offset int) ([]contr
 		}
 		return nil, err
 	}
-	defer f.Close()
+	defer func() { _ = f.Close() }()
 
 	var events []contract.TurnItem
 	scanner := bufio.NewScanner(f)
@@ -104,7 +104,7 @@ func (s *FileSessionStore) Prune(threadID contract.ThreadID, maxEvents int) erro
 	if err != nil {
 		return err
 	}
-	defer f.Close()
+	defer func() { _ = f.Close() }()
 
 	enc := json.NewEncoder(f)
 	for _, ev := range events {

@@ -15,9 +15,9 @@ type stubTool struct {
 	result *tool.Result
 }
 
-func (t *stubTool) Name() string                                        { return t.name }
-func (t *stubTool) Description() string                                 { return t.name + " tool" }
-func (t *stubTool) Schema() json.RawMessage                            { return json.RawMessage(`{}`) }
+func (t *stubTool) Name() string            { return t.name }
+func (t *stubTool) Description() string     { return t.name + " tool" }
+func (t *stubTool) Schema() json.RawMessage { return json.RawMessage(`{}`) }
 func (t *stubTool) Execute(_ context.Context, _ json.RawMessage, _ *tool.Context) (*tool.Result, error) {
 	return t.result, nil
 }

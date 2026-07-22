@@ -19,10 +19,10 @@ type SSEEvent struct {
 // AlfredRuntime is a level-4 runtime that adds SSE streaming and replay buffers.
 type AlfredRuntime struct {
 	*LocalRuntime
-	replayMu   sync.RWMutex
-	replayBuf  map[contract.ThreadID][]SSEEvent
-	subsMu     sync.RWMutex
-	subs       map[contract.ThreadID][]chan SSEEvent
+	replayMu  sync.RWMutex
+	replayBuf map[contract.ThreadID][]SSEEvent
+	subsMu    sync.RWMutex
+	subs      map[contract.ThreadID][]chan SSEEvent
 }
 
 // NewAlfredRuntime creates an AlfredRuntime.
@@ -37,7 +37,7 @@ func NewAlfredRuntime(bearerToken string, ts ThreadStore, ss SessionStore) *Alfr
 }
 
 func (r *AlfredRuntime) setupSSERoutes() {
-	r.HTTPRuntime.mux.HandleFunc("GET /v1/threads/{id}/events", r.handleSSE)
+	r.mux.HandleFunc("GET /v1/threads/{id}/events", r.handleSSE)
 }
 
 func (r *AlfredRuntime) handleSSE(w http.ResponseWriter, req *http.Request) {
@@ -117,11 +117,11 @@ func (r *AlfredRuntime) PublishEvent(threadID contract.ThreadID, ev SSEEvent) {
 
 func writeSSE(w http.ResponseWriter, ev SSEEvent) {
 	if ev.ID != "" {
-		fmt.Fprintf(w, "id: %s\n", ev.ID)
+		_, _ = fmt.Fprintf(w, "id: %s\n", ev.ID)
 	}
 	if ev.Event != "" {
-		fmt.Fprintf(w, "event: %s\n", ev.Event)
+		_, _ = fmt.Fprintf(w, "event: %s\n", ev.Event)
 	}
 	data, _ := json.Marshal(ev.Data)
-	fmt.Fprintf(w, "data: %s\n\n", data)
+	_, _ = fmt.Fprintf(w, "data: %s\n\n", data)
 }

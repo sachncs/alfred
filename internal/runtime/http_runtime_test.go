@@ -24,7 +24,7 @@ func TestHTTPRuntimeHealth(t *testing.T) {
 		t.Errorf("status = %d, want 200", w.Code)
 	}
 	var resp contract.HealthResponse
-	json.NewDecoder(w.Body).Decode(&resp)
+	_ = json.NewDecoder(w.Body).Decode(&resp)
 	if resp.Status != "ok" {
 		t.Errorf("status = %q, want ok", resp.Status)
 	}

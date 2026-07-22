@@ -35,7 +35,7 @@ func TestMemoryStoreDelete(t *testing.T) {
 	dir := t.TempDir()
 	s, _ := NewMemoryStore(dir)
 
-	s.Set(MemoryScopeUser, "key", "val")
+	_ = s.Set(MemoryScopeUser, "key", "val")
 	if err := s.Delete(MemoryScopeUser, "key"); err != nil {
 		t.Fatal(err)
 	}
@@ -50,9 +50,9 @@ func TestMemoryStoreList(t *testing.T) {
 	dir := t.TempDir()
 	s, _ := NewMemoryStore(dir)
 
-	s.Set(MemoryScopeUser, "a", 1)
-	s.Set(MemoryScopeUser, "b", 2)
-	s.Set(MemoryScopeUser, "c", 3)
+	_ = s.Set(MemoryScopeUser, "a", 1)
+	_ = s.Set(MemoryScopeUser, "b", 2)
+	_ = s.Set(MemoryScopeUser, "c", 3)
 
 	entries, err := s.List(MemoryScopeUser)
 	if err != nil {
@@ -67,9 +67,9 @@ func TestMemoryStoreScopeIsolation(t *testing.T) {
 	dir := t.TempDir()
 	s, _ := NewMemoryStore(dir)
 
-	s.Set(MemoryScopeUser, "key", "user-val")
-	s.Set(MemoryScopeWorkspace, "key", "workspace-val")
-	s.Set(MemoryScopeProject, "key", "project-val")
+	_ = s.Set(MemoryScopeUser, "key", "user-val")
+	_ = s.Set(MemoryScopeWorkspace, "key", "workspace-val")
+	_ = s.Set(MemoryScopeProject, "key", "project-val")
 
 	user, _ := s.Get(MemoryScopeUser, "key")
 	ws, _ := s.Get(MemoryScopeWorkspace, "key")
@@ -90,8 +90,8 @@ func TestMemoryStoreOverwrite(t *testing.T) {
 	dir := t.TempDir()
 	s, _ := NewMemoryStore(dir)
 
-	s.Set(MemoryScopeUser, "key", "first")
-	s.Set(MemoryScopeUser, "key", "second")
+	_ = s.Set(MemoryScopeUser, "key", "first")
+	_ = s.Set(MemoryScopeUser, "key", "second")
 
 	e, _ := s.Get(MemoryScopeUser, "key")
 	if e.Value != "second" {
@@ -104,7 +104,7 @@ func TestMemoryStoreComplexValue(t *testing.T) {
 	s, _ := NewMemoryStore(dir)
 
 	val := map[string]any{"nested": true, "count": 42}
-	s.Set(MemoryScopeUser, "obj", val)
+	_ = s.Set(MemoryScopeUser, "obj", val)
 
 	e, _ := s.Get(MemoryScopeUser, "obj")
 	if e.Value == nil {

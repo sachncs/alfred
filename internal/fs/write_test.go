@@ -56,10 +56,10 @@ func TestWriteToolOverwrite(t *testing.T) {
 	tc := tool.NewContext(context.Background(), "", "", "", dir)
 
 	input, _ := json.Marshal(WriteInput{Path: "file.txt", Content: "first"})
-	wt.Execute(context.Background(), input, tc)
+	_, _ = wt.Execute(context.Background(), input, tc)
 
 	input, _ = json.Marshal(WriteInput{Path: "file.txt", Content: "second"})
-	wt.Execute(context.Background(), input, tc)
+	_, _ = wt.Execute(context.Background(), input, tc)
 
 	data, _ := os.ReadFile(filepath.Join(dir, "file.txt"))
 	if string(data) != "second" {
@@ -73,7 +73,7 @@ func TestWriteToolBOMStripped(t *testing.T) {
 	tc := tool.NewContext(context.Background(), "", "", "", dir)
 
 	input, _ := json.Marshal(WriteInput{Path: "bom.txt", Content: "\xEF\xBB\xBFwith bom"})
-	wt.Execute(context.Background(), input, tc)
+	_, _ = wt.Execute(context.Background(), input, tc)
 
 	data, _ := os.ReadFile(filepath.Join(dir, "bom.txt"))
 	if hasBOM(data) {
@@ -90,7 +90,7 @@ func TestWriteToolCRLFNormalized(t *testing.T) {
 	tc := tool.NewContext(context.Background(), "", "", "", dir)
 
 	input, _ := json.Marshal(WriteInput{Path: "crlf.txt", Content: "line1\r\nline2\r\n"})
-	wt.Execute(context.Background(), input, tc)
+	_, _ = wt.Execute(context.Background(), input, tc)
 
 	data, _ := os.ReadFile(filepath.Join(dir, "crlf.txt"))
 	if string(data) != "line1\nline2\n" {

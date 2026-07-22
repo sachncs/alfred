@@ -20,8 +20,8 @@ func TestDefaults(t *testing.T) {
 
 func TestApplyEnvPort(t *testing.T) {
 	cfg := Defaults()
-	os.Setenv("ALFRED_PORT", "9999")
-	defer os.Unsetenv("ALFRED_PORT")
+	_ = os.Setenv("ALFRED_PORT", "9999")
+	defer func() { _ = os.Unsetenv("ALFRED_PORT") }()
 
 	cfg.ApplyEnv()
 	if cfg.Port != 9999 {
@@ -31,8 +31,8 @@ func TestApplyEnvPort(t *testing.T) {
 
 func TestApplyEnvWorkspaceRoot(t *testing.T) {
 	cfg := Defaults()
-	os.Setenv("ALFRED_WORKSPACE_ROOT", "/tmp/test-workspace")
-	defer os.Unsetenv("ALFRED_WORKSPACE_ROOT")
+	_ = os.Setenv("ALFRED_WORKSPACE_ROOT", "/tmp/test-workspace")
+	defer func() { _ = os.Unsetenv("ALFRED_WORKSPACE_ROOT") }()
 
 	cfg.ApplyEnv()
 	if cfg.WorkspaceRoot != "/tmp/test-workspace" {
@@ -42,8 +42,8 @@ func TestApplyEnvWorkspaceRoot(t *testing.T) {
 
 func TestApplyEnvBearerToken(t *testing.T) {
 	cfg := Defaults()
-	os.Setenv("ALFRED_BEARER_TOKEN", "secret-token")
-	defer os.Unsetenv("ALFRED_BEARER_TOKEN")
+	_ = os.Setenv("ALFRED_BEARER_TOKEN", "secret-token")
+	defer func() { _ = os.Unsetenv("ALFRED_BEARER_TOKEN") }()
 
 	cfg.ApplyEnv()
 	if cfg.BearerToken != "secret-token" {
@@ -54,8 +54,8 @@ func TestApplyEnvBearerToken(t *testing.T) {
 func TestApplyEnvInvalidPortIgnored(t *testing.T) {
 	cfg := Defaults()
 	cfg.Port = 8899
-	os.Setenv("ALFRED_PORT", "not-a-number")
-	defer os.Unsetenv("ALFRED_PORT")
+	_ = os.Setenv("ALFRED_PORT", "not-a-number")
+	defer func() { _ = os.Unsetenv("ALFRED_PORT") }()
 
 	cfg.ApplyEnv()
 	if cfg.Port != 8899 {

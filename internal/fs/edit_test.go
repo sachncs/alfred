@@ -13,7 +13,7 @@ import (
 func TestEditToolBasic(t *testing.T) {
 	dir := t.TempDir()
 	path := filepath.Join(dir, "test.txt")
-	os.WriteFile(path, []byte("hello world"), 0o644)
+	_ = os.WriteFile(path, []byte("hello world"), 0o644)
 
 	et := NewEditTool()
 	tc := tool.NewContext(context.Background(), "", "", "", dir)
@@ -36,7 +36,7 @@ func TestEditToolBasic(t *testing.T) {
 func TestEditToolDiff(t *testing.T) {
 	dir := t.TempDir()
 	path := filepath.Join(dir, "test.txt")
-	os.WriteFile(path, []byte("line1\nline2\nline3"), 0o644)
+	_ = os.WriteFile(path, []byte("line1\nline2\nline3"), 0o644)
 
 	et := NewEditTool()
 	tc := tool.NewContext(context.Background(), "", "", "", dir)
@@ -45,7 +45,7 @@ func TestEditToolDiff(t *testing.T) {
 	res, _ := et.Execute(context.Background(), input, tc)
 
 	var out EditOutput
-	json.Unmarshal(res.Structured, &out)
+	_ = json.Unmarshal(res.Structured, &out)
 	if out.Diff == "" {
 		t.Error("expected non-empty diff")
 	}
@@ -54,7 +54,7 @@ func TestEditToolDiff(t *testing.T) {
 func TestEditToolNotFound(t *testing.T) {
 	dir := t.TempDir()
 	path := filepath.Join(dir, "test.txt")
-	os.WriteFile(path, []byte("hello"), 0o644)
+	_ = os.WriteFile(path, []byte("hello"), 0o644)
 
 	et := NewEditTool()
 	tc := tool.NewContext(context.Background(), "", "", "", dir)
@@ -69,7 +69,7 @@ func TestEditToolNotFound(t *testing.T) {
 func TestEditToolMultipleMatches(t *testing.T) {
 	dir := t.TempDir()
 	path := filepath.Join(dir, "test.txt")
-	os.WriteFile(path, []byte("aaa bbb aaa"), 0o644)
+	_ = os.WriteFile(path, []byte("aaa bbb aaa"), 0o644)
 
 	et := NewEditTool()
 	tc := tool.NewContext(context.Background(), "", "", "", dir)
@@ -85,7 +85,7 @@ func TestEditToolFuzzyMatch(t *testing.T) {
 	dir := t.TempDir()
 	path := filepath.Join(dir, "test.txt")
 	// Content has extra spaces.
-	os.WriteFile(path, []byte("hello   world"), 0o644)
+	_ = os.WriteFile(path, []byte("hello   world"), 0o644)
 
 	et := NewEditTool()
 	tc := tool.NewContext(context.Background(), "", "", "", dir)

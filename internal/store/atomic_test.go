@@ -29,8 +29,8 @@ func TestAtomicWriteOverwrite(t *testing.T) {
 	dir := t.TempDir()
 	path := filepath.Join(dir, "test.json")
 
-	AtomicWrite(path, []byte("first"))
-	AtomicWrite(path, []byte("second"))
+	_ = AtomicWrite(path, []byte("first"))
+	_ = AtomicWrite(path, []byte("second"))
 
 	got, _ := os.ReadFile(path)
 	if string(got) != "second" {
@@ -42,7 +42,7 @@ func TestAtomicWriteNoTmpLeftBehind(t *testing.T) {
 	dir := t.TempDir()
 	path := filepath.Join(dir, "test.json")
 
-	AtomicWrite(path, []byte("data"))
+	_ = AtomicWrite(path, []byte("data"))
 
 	tmp := path + ".tmp"
 	if _, err := os.Stat(tmp); err == nil {
@@ -59,7 +59,7 @@ func TestAtomicWriteConcurrent(t *testing.T) {
 		wg.Add(1)
 		go func(i int) {
 			defer wg.Done()
-			AtomicWrite(path, []byte("data"))
+			_ = AtomicWrite(path, []byte("data"))
 		}(i)
 	}
 	wg.Wait()
@@ -77,8 +77,8 @@ func TestAtomicWriteConcurrent(t *testing.T) {
 func TestAtomicWriteToReadonlyDir(t *testing.T) {
 	dir := t.TempDir()
 	sub := filepath.Join(dir, "readonly")
-	os.Mkdir(sub, 0o555)
-	defer os.Chmod(sub, 0o755) // cleanup
+	_ = os.Mkdir(sub, 0o555)
+	defer func() { _ = os.Chmod(sub, 0o755) }() // cleanup
 
 	err := AtomicWrite(filepath.Join(sub, "file.json"), []byte("data"))
 	if err == nil {

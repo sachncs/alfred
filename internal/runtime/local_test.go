@@ -27,7 +27,7 @@ func TestLocalRuntimeListThreadsEmpty(t *testing.T) {
 		t.Errorf("status = %d, want 200", w.Code)
 	}
 	var resp contract.ListThreadsResponse
-	json.NewDecoder(w.Body).Decode(&resp)
+	_ = json.NewDecoder(w.Body).Decode(&resp)
 	if len(resp.Threads) != 0 {
 		t.Errorf("threads = %d, want 0", len(resp.Threads))
 	}
@@ -47,7 +47,7 @@ func TestLocalRuntimeCreateAndGetThread(t *testing.T) {
 		t.Fatalf("create status = %d, want 201", w.Code)
 	}
 	var createResp contract.CreateThreadResponse
-	json.NewDecoder(w.Body).Decode(&createResp)
+	_ = json.NewDecoder(w.Body).Decode(&createResp)
 	if createResp.Thread.Title != "test" {
 		t.Errorf("title = %q, want test", createResp.Thread.Title)
 	}
@@ -71,7 +71,7 @@ func TestLocalRuntimeDeleteThread(t *testing.T) {
 	w := httptest.NewRecorder()
 	rt.Handler().ServeHTTP(w, req)
 	var createResp contract.CreateThreadResponse
-	json.NewDecoder(w.Body).Decode(&createResp)
+	_ = json.NewDecoder(w.Body).Decode(&createResp)
 
 	// Delete
 	req = httptest.NewRequest("DELETE", "/v1/threads/"+string(createResp.Thread.ID), nil)

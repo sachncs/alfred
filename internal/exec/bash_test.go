@@ -44,7 +44,7 @@ func TestBashToolStderr(t *testing.T) {
 		t.Fatal(err)
 	}
 	var out BashOutput
-	json.Unmarshal(res.Structured, &out)
+	_ = json.Unmarshal(res.Structured, &out)
 	if out.Stderr == "" {
 		t.Error("expected stderr output")
 	}

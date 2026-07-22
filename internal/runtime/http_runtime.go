@@ -13,10 +13,10 @@ import (
 
 // HTTPRuntime is a level-2 runtime that serves the HTTP API.
 type HTTPRuntime struct {
-	state      *RuntimeState
-	mux        *http.ServeMux
-	tools      []tool.Tool
-	bearerToken string
+	state        *RuntimeState
+	mux          *http.ServeMux
+	tools        []tool.Tool
+	bearerToken  string
 	threadStore  ThreadStore
 	sessionStore SessionStore
 }
@@ -24,9 +24,9 @@ type HTTPRuntime struct {
 // NewHTTPRuntime creates an HTTPRuntime with the given bearer token.
 func NewHTTPRuntime(bearerToken string, ts ThreadStore, ss SessionStore) *HTTPRuntime {
 	r := &HTTPRuntime{
-		state:       NewRuntimeState(),
-		mux:         http.NewServeMux(),
-		bearerToken: bearerToken,
+		state:        NewRuntimeState(),
+		mux:          http.NewServeMux(),
+		bearerToken:  bearerToken,
 		threadStore:  ts,
 		sessionStore: ss,
 	}
@@ -46,7 +46,7 @@ func (r *HTTPRuntime) handleHealth(w http.ResponseWriter, req *http.Request) {
 		Timestamp: time.Now().UTC(),
 	}
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(resp)
+	_ = json.NewEncoder(w).Encode(resp)
 }
 
 // Start begins serving on the given port. Blocks until ctx is cancelled.
@@ -57,10 +57,9 @@ func (r *HTTPRuntime) Start(ctx context.Context, port int) error {
 		Handler: r.Handler(),
 	}
 
-	// Shutdown server when context is cancelled.
 	go func() {
 		<-ctx.Done()
-		srv.Shutdown(context.Background())
+		_ = srv.Shutdown(context.Background())
 	}()
 
 	return srv.ListenAndServe()

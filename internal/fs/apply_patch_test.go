@@ -13,7 +13,7 @@ import (
 func TestApplyPatchBasic(t *testing.T) {
 	dir := t.TempDir()
 	path := filepath.Join(dir, "test.txt")
-	os.WriteFile(path, []byte("hello world"), 0o644)
+	_ = os.WriteFile(path, []byte("hello world"), 0o644)
 
 	apt := NewApplyPatchTool()
 	tc := tool.NewContext(context.Background(), "", "", "", dir)
@@ -42,7 +42,7 @@ func TestApplyPatchBasic(t *testing.T) {
 func TestApplyPatchMultipleHunks(t *testing.T) {
 	dir := t.TempDir()
 	path := filepath.Join(dir, "test.txt")
-	os.WriteFile(path, []byte("aaa\nbbb\nccc"), 0o644)
+	_ = os.WriteFile(path, []byte("aaa\nbbb\nccc"), 0o644)
 
 	apt := NewApplyPatchTool()
 	tc := tool.NewContext(context.Background(), "", "", "", dir)
@@ -78,7 +78,7 @@ func TestApplyPatchMultipleHunks(t *testing.T) {
 func TestApplyPatchDryRun(t *testing.T) {
 	dir := t.TempDir()
 	path := filepath.Join(dir, "test.txt")
-	os.WriteFile(path, []byte("original"), 0o644)
+	_ = os.WriteFile(path, []byte("original"), 0o644)
 
 	apt := NewApplyPatchTool()
 	tc := tool.NewContext(context.Background(), "", "", "", dir)
@@ -107,7 +107,7 @@ func TestApplyPatchDryRun(t *testing.T) {
 func TestApplyPatchHunkNotFound(t *testing.T) {
 	dir := t.TempDir()
 	path := filepath.Join(dir, "test.txt")
-	os.WriteFile(path, []byte("hello"), 0o644)
+	_ = os.WriteFile(path, []byte("hello"), 0o644)
 
 	apt := NewApplyPatchTool()
 	tc := tool.NewContext(context.Background(), "", "", "", dir)

@@ -1,7 +1,6 @@
 package search
 
 import (
-	"bufio"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -99,17 +98,4 @@ func (t *FindTool) Execute(ctx context.Context, raw json.RawMessage, tc *tool.Co
 		return tool.SuccessWith("no files found", out), nil
 	}
 	return tool.SuccessWith(fmt.Sprintf("%d files found", len(files)), out), nil
-}
-
-// isBinaryFile checks if data looks like a binary file.
-func isBinaryFile(data []byte) bool {
-	scanner := bufio.NewScanner(strings.NewReader(string(data)))
-	for scanner.Scan() {
-		for _, b := range scanner.Bytes() {
-			if b == 0 {
-				return true
-			}
-		}
-	}
-	return false
 }

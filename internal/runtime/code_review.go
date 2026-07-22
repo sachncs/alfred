@@ -36,9 +36,9 @@ type ReviewResult struct {
 
 // ReviewIssue is a single issue found during review.
 type ReviewIssue struct {
-	File    string
-	Line    int
-	Message string
+	File     string
+	Line     int
+	Message  string
 	Severity string
 }
 

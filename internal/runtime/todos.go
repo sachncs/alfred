@@ -35,7 +35,7 @@ func (s *TodoStore) Add(threadID, title string, priority int) TodoItem {
 	s.nextID++
 	now := time.Now().UTC()
 	t := TodoItem{
-		ID:        string(rune('a'-1+s.nextID)),
+		ID:        string(rune('a' - 1 + s.nextID)),
 		ThreadID:  threadID,
 		Title:     title,
 		Status:    "pending",

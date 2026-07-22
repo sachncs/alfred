@@ -2,6 +2,8 @@ package runtime
 
 import (
 	"bufio"
+	"context"
+	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
@@ -38,29 +40,37 @@ func TestAlfredRuntimeSSEReplay(t *testing.T) {
 		Data:  map[string]string{"turnId": "t1"},
 	})
 
-	// Subscribe — should get replayed event.
-	req := httptest.NewRequest("GET", "/v1/threads/thr1/events", nil)
-	w := httptest.NewRecorder()
-	go func() {
-		time.AfterFunc(100*time.Millisecond, func() {
-			// Close the connection by cancelling context.
-		})
-		rt.Handler().ServeHTTP(w, req)
-	}()
+	// Use a real server to avoid ResponseRecorder race.
+	srv := httptest.NewServer(rt.Handler())
+	defer srv.Close()
 
-	time.Sleep(50 * time.Millisecond)
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancel()
+	req, _ := http.NewRequestWithContext(ctx, "GET", srv.URL+"/v1/threads/thr1/events", nil)
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		t.Fatalf("request failed: %v", err)
+	}
+	defer func() { _ = resp.Body.Close() }()
 
-	scanner := bufio.NewScanner(w.Body)
+	scanner := bufio.NewScanner(resp.Body)
 	gotReplay := false
-	for scanner.Scan() {
-		line := scanner.Text()
-		if strings.Contains(line, "e1") {
-			gotReplay = true
-			break
+	timeout := time.After(500 * time.Millisecond)
+	for {
+		select {
+		case <-timeout:
+			_ = resp.Body.Close()
+			_ = gotReplay
+			return
+		default:
+		}
+		if scanner.Scan() {
+			line := scanner.Text()
+			if strings.Contains(line, "e1") {
+				gotReplay = true
+			}
 		}
 	}
-	// Replay may or may not arrive depending on timing — just verify no crash.
-	_ = gotReplay
 }
 
 func TestAlfredRuntimePublishToSubscribers(t *testing.T) {
@@ -69,7 +79,6 @@ func TestAlfredRuntimePublishToSubscribers(t *testing.T) {
 
 	done := make(chan []SSEEvent, 1)
 	go func() {
-		// Simulate subscriber.
 		ch := make(chan SSEEvent, 64)
 		rt.subsMu.Lock()
 		rt.subs[threadID] = append(rt.subs[threadID], ch)

@@ -8,9 +8,9 @@ import (
 type CompactionMode string
 
 const (
-	CompactionNormal   CompactionMode = "normal"   // summarize, keep recent
+	CompactionNormal     CompactionMode = "normal"     // summarize, keep recent
 	CompactionAggressive CompactionMode = "aggressive" // drop old turns, keep summary
-	CompactionForce    CompactionMode = "force"     // truncate to minimum
+	CompactionForce      CompactionMode = "force"      // truncate to minimum
 )
 
 // Compactor summarizes older turns to keep the context window under budget.

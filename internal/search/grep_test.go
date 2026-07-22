@@ -12,7 +12,7 @@ import (
 
 func TestGrepToolBasic(t *testing.T) {
 	dir := t.TempDir()
-	os.WriteFile(filepath.Join(dir, "a.txt"), []byte("hello world\nfoo bar\nhello go"), 0o644)
+	_ = os.WriteFile(filepath.Join(dir, "a.txt"), []byte("hello world\nfoo bar\nhello go"), 0o644)
 
 	gt := NewGrepTool()
 	tc := tool.NewContext(context.Background(), "", "", "", dir)
@@ -27,7 +27,7 @@ func TestGrepToolBasic(t *testing.T) {
 	}
 
 	var out GrepOutput
-	json.Unmarshal(res.Structured, &out)
+	_ = json.Unmarshal(res.Structured, &out)
 	if out.Count != 2 {
 		t.Errorf("count = %d, want 2", out.Count)
 	}
@@ -35,8 +35,8 @@ func TestGrepToolBasic(t *testing.T) {
 
 func TestGrepToolGlobFilter(t *testing.T) {
 	dir := t.TempDir()
-	os.WriteFile(filepath.Join(dir, "a.go"), []byte("package main"), 0o644)
-	os.WriteFile(filepath.Join(dir, "b.txt"), []byte("package main"), 0o644)
+	_ = os.WriteFile(filepath.Join(dir, "a.go"), []byte("package main"), 0o644)
+	_ = os.WriteFile(filepath.Join(dir, "b.txt"), []byte("package main"), 0o644)
 
 	gt := NewGrepTool()
 	tc := tool.NewContext(context.Background(), "", "", "", dir)
@@ -45,7 +45,7 @@ func TestGrepToolGlobFilter(t *testing.T) {
 	res, _ := gt.Execute(context.Background(), input, tc)
 
 	var out GrepOutput
-	json.Unmarshal(res.Structured, &out)
+	_ = json.Unmarshal(res.Structured, &out)
 	if out.Count != 1 {
 		t.Errorf("count = %d, want 1", out.Count)
 	}
@@ -56,7 +56,7 @@ func TestGrepToolGlobFilter(t *testing.T) {
 
 func TestGrepToolNoMatches(t *testing.T) {
 	dir := t.TempDir()
-	os.WriteFile(filepath.Join(dir, "a.txt"), []byte("hello"), 0o644)
+	_ = os.WriteFile(filepath.Join(dir, "a.txt"), []byte("hello"), 0o644)
 
 	gt := NewGrepTool()
 	tc := tool.NewContext(context.Background(), "", "", "", dir)
@@ -65,7 +65,7 @@ func TestGrepToolNoMatches(t *testing.T) {
 	res, _ := gt.Execute(context.Background(), input, tc)
 
 	var out GrepOutput
-	json.Unmarshal(res.Structured, &out)
+	_ = json.Unmarshal(res.Structured, &out)
 	if out.Count != 0 {
 		t.Errorf("count = %d, want 0", out.Count)
 	}
@@ -91,9 +91,9 @@ func TestGrepToolEmptyPattern(t *testing.T) {
 
 func TestGrepToolSkipsGit(t *testing.T) {
 	dir := t.TempDir()
-	os.MkdirAll(filepath.Join(dir, ".git"), 0o755)
-	os.WriteFile(filepath.Join(dir, ".git", "config"), []byte("match me"), 0o644)
-	os.WriteFile(filepath.Join(dir, "a.txt"), []byte("match me"), 0o644)
+	_ = os.MkdirAll(filepath.Join(dir, ".git"), 0o755)
+	_ = os.WriteFile(filepath.Join(dir, ".git", "config"), []byte("match me"), 0o644)
+	_ = os.WriteFile(filepath.Join(dir, "a.txt"), []byte("match me"), 0o644)
 
 	gt := NewGrepTool()
 	tc := tool.NewContext(context.Background(), "", "", "", dir)
@@ -102,7 +102,7 @@ func TestGrepToolSkipsGit(t *testing.T) {
 	res, _ := gt.Execute(context.Background(), input, tc)
 
 	var out GrepOutput
-	json.Unmarshal(res.Structured, &out)
+	_ = json.Unmarshal(res.Structured, &out)
 	if out.Count != 1 {
 		t.Errorf("count = %d, want 1 (should skip .git)", out.Count)
 	}

@@ -6,10 +6,10 @@ import (
 
 // ToolBudget limits how many times a tool can be called per turn.
 type ToolBudget struct {
-	mu       sync.Mutex
-	limits   map[string]int // tool name → max calls per turn
-	counts   map[string]int // tool name → current calls in this turn
-	turnID   string
+	mu     sync.Mutex
+	limits map[string]int // tool name → max calls per turn
+	counts map[string]int // tool name → current calls in this turn
+	turnID string
 }
 
 // NewToolBudget creates a budget with per-tool limits. 0 = unlimited.
