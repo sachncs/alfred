@@ -1,0 +1,12 @@
+/todo/
+/bin/
+/dist/
+*.out
+*.test
+*.prof
+.DS_Store
+.idea/
+.vscode/
+.env
+.env.local
+*.log
