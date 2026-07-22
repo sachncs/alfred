@@ -1,0 +1,127 @@
+package runtime
+
+import (
+	"encoding/json"
+	"fmt"
+	"net/http"
+	"sync"
+
+	"github.com/alfred/alfred/internal/contract"
+)
+
+// SSEEvent is a server-sent event.
+type SSEEvent struct {
+	ID    string `json:"id"`
+	Event string `json:"event"`
+	Data  any    `json:"data"`
+}
+
+// AlfredRuntime is a level-4 runtime that adds SSE streaming and replay buffers.
+type AlfredRuntime struct {
+	*LocalRuntime
+	replayMu   sync.RWMutex
+	replayBuf  map[contract.ThreadID][]SSEEvent
+	subsMu     sync.RWMutex
+	subs       map[contract.ThreadID][]chan SSEEvent
+}
+
+// NewAlfredRuntime creates an AlfredRuntime.
+func NewAlfredRuntime(bearerToken string, ts ThreadStore, ss SessionStore) *AlfredRuntime {
+	rt := &AlfredRuntime{
+		LocalRuntime: NewLocalRuntime(bearerToken, ts, ss),
+		replayBuf:    make(map[contract.ThreadID][]SSEEvent),
+		subs:         make(map[contract.ThreadID][]chan SSEEvent),
+	}
+	rt.setupSSERoutes()
+	return rt
+}
+
+func (r *AlfredRuntime) setupSSERoutes() {
+	r.HTTPRuntime.mux.HandleFunc("GET /v1/threads/{id}/events", r.handleSSE)
+}
+
+func (r *AlfredRuntime) handleSSE(w http.ResponseWriter, req *http.Request) {
+	id := contract.ThreadID(req.PathValue("id"))
+
+	flusher, ok := w.(http.Flusher)
+	if !ok {
+		http.Error(w, "streaming not supported", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "text/event-stream")
+	w.Header().Set("Cache-Control", "no-cache")
+	w.Header().Set("Connection", "keep-alive")
+
+	// Send replay buffer.
+	r.replayMu.RLock()
+	events := r.replayBuf[id]
+	r.replayMu.RUnlock()
+
+	for _, ev := range events {
+		writeSSE(w, ev)
+		flusher.Flush()
+	}
+
+	// Subscribe for new events.
+	ch := make(chan SSEEvent, 64)
+	r.subsMu.Lock()
+	r.subs[id] = append(r.subs[id], ch)
+	r.subsMu.Unlock()
+
+	defer func() {
+		r.subsMu.Lock()
+		subs := r.subs[id]
+		for i, s := range subs {
+			if s == ch {
+				r.subs[id] = append(subs[:i], subs[i+1:]...)
+				break
+			}
+		}
+		r.subsMu.Unlock()
+		close(ch)
+	}()
+
+	for {
+		select {
+		case <-req.Context().Done():
+			return
+		case ev, ok := <-ch:
+			if !ok {
+				return
+			}
+			writeSSE(w, ev)
+			flusher.Flush()
+		}
+	}
+}
+
+// PublishEvent sends an event to all subscribers of a thread and appends to replay buffer.
+func (r *AlfredRuntime) PublishEvent(threadID contract.ThreadID, ev SSEEvent) {
+	r.replayMu.Lock()
+	r.replayBuf[threadID] = append(r.replayBuf[threadID], ev)
+	r.replayMu.Unlock()
+
+	r.subsMu.RLock()
+	subs := r.subs[threadID]
+	r.subsMu.RUnlock()
+
+	for _, ch := range subs {
+		select {
+		case ch <- ev:
+		default:
+			// ponytail: drop if subscriber is slow, don't block publisher
+		}
+	}
+}
+
+func writeSSE(w http.ResponseWriter, ev SSEEvent) {
+	if ev.ID != "" {
+		fmt.Fprintf(w, "id: %s\n", ev.ID)
+	}
+	if ev.Event != "" {
+		fmt.Fprintf(w, "event: %s\n", ev.Event)
+	}
+	data, _ := json.Marshal(ev.Data)
+	fmt.Fprintf(w, "data: %s\n\n", data)
+}
