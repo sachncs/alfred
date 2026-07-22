@@ -2,31 +2,62 @@ package runtime
 
 import (
 	"testing"
+
+	"github.com/alfred/alfred/internal/contract"
 )
 
 func TestCompactorNoOp(t *testing.T) {
-	c := NewCompactor(nil, 40, 20)
-	turns := make([]struct{ ID string }, 10)
+	c := NewCompactor(40, 20)
 	result := c.MaybeCompact(nil)
 	if result != nil {
 		t.Error("expected nil for nil input")
 	}
-	_ = turns
 }
 
 func TestCompactorCompactsWhenOver(t *testing.T) {
-	client := &stubClient{responses: []responseSeq{{text: "summary"}}}
-	c := NewCompactor(client, 40, 3)
-
-	type miniTurn struct{ ID string }
-	turns := make([]miniTurn, 5)
-	_ = turns
+	c := NewCompactor(40, 3)
 
 	if !c.ShouldCompact(10) {
 		t.Error("expected ShouldCompact(10) = true")
 	}
 	if c.ShouldCompact(2) {
 		t.Error("expected ShouldCompact(2) = false")
+	}
+}
+
+func TestCompactorNormal(t *testing.T) {
+	c := NewCompactor(40, 3)
+	turns := make([]contract.Turn, 5)
+	for i := range turns {
+		turns[i] = contract.Turn{
+			ID:     contract.TurnID(string(rune('a' + i))),
+			Status: contract.TurnStatusCompleted,
+		}
+	}
+	compacted := c.Compact(turns, CompactionNormal)
+	if len(compacted) != 4 { // 1 summary + 3 recent
+		t.Errorf("normal compact: got %d turns, want 4", len(compacted))
+	}
+	if compacted[0].Items[0].Kind != contract.ItemKindCompaction {
+		t.Error("first turn should be compaction summary")
+	}
+}
+
+func TestCompactorAggressive(t *testing.T) {
+	c := NewCompactor(40, 6)
+	turns := make([]contract.Turn, 10)
+	compacted := c.Compact(turns, CompactionAggressive)
+	if len(compacted) > 5 {
+		t.Errorf("aggressive compact: got %d, want <= 5", len(compacted))
+	}
+}
+
+func TestCompactorForce(t *testing.T) {
+	c := NewCompactor(40, 3)
+	turns := make([]contract.Turn, 10)
+	compacted := c.Compact(turns, CompactionForce)
+	if len(compacted) != 3 { // 1 summary + 2 recent
+		t.Errorf("force compact: got %d, want 3", len(compacted))
 	}
 }
 
@@ -74,7 +105,7 @@ func TestBuildPromptUnlimited(t *testing.T) {
 
 func TestBuildPromptLimited(t *testing.T) {
 	history := []string{"a short msg", "a much longer message that exceeds"}
-	result := BuildPrompt(history, 100) // generous limit
+	result := BuildPrompt(history, 100)
 	if len(result) == 0 {
 		t.Error("expected non-empty prompt")
 	}
@@ -82,7 +113,6 @@ func TestBuildPromptLimited(t *testing.T) {
 
 func TestHistoryPruner(t *testing.T) {
 	p := NewHistoryPruner(3)
-	// Don't need real turns — test the logic
 	if p.ShouldPrune(5) != true {
 		t.Error("should prune")
 	}
@@ -155,7 +185,6 @@ func TestToolBudget(t *testing.T) {
 	if b.Remaining("bash") != 0 {
 		t.Errorf("remaining = %d, want 0", b.Remaining("bash"))
 	}
-	// Unknown tool is unlimited.
 	if !b.Allow("echo") {
 		t.Error("echo should be unlimited")
 	}
@@ -203,5 +232,58 @@ func TestGoalStore(t *testing.T) {
 	completed := s.ListGoals()
 	if completed[0].Status != "completed" {
 		t.Errorf("goal status = %q, want completed", completed[0].Status)
+	}
+}
+
+func TestCacheTelemetry(t *testing.T) {
+	ct := NewCacheTelemetry()
+	ct.RecordHit("prompt")
+	ct.RecordHit("prompt")
+	ct.RecordMiss("prompt")
+	hits, misses := ct.Stats("prompt")
+	if hits != 2 || misses != 1 {
+		t.Errorf("hits=%d misses=%d, want 2/1", hits, misses)
+	}
+	ct.Reset()
+	hits, _ = ct.Stats("prompt")
+	if hits != 0 {
+		t.Errorf("hits after reset = %d, want 0", hits)
+	}
+}
+
+func TestStripANSI(t *testing.T) {
+	input := "\x1b[31mred text\x1b[0m"
+	got := StripANSI(input)
+	if got != "red text" {
+		t.Errorf("StripANSI = %q, want %q", got, "red text")
+	}
+}
+
+func TestHistoryHygiene(t *testing.T) {
+	h := NewHistoryHygiene()
+	text := "hello\x1b[32m world\x1b[0m"
+	clean := h.CleanText(text)
+	if clean != "hello world" {
+		t.Errorf("CleanText = %q, want %q", clean, "hello world")
+	}
+}
+
+func TestSummaryCount(t *testing.T) {
+	if SummaryCount(10, 6) != 4 {
+		t.Error("wrong count")
+	}
+	if SummaryCount(3, 5) != 0 {
+		t.Error("should not go negative")
+	}
+}
+
+func TestItoa(t *testing.T) {
+	tests := []struct{ in int; want string }{
+		{0, "0"}, {1, "1"}, {42, "42"}, {123, "123"},
+	}
+	for _, tt := range tests {
+		if got := itoa(tt.in); got != tt.want {
+			t.Errorf("itoa(%d) = %q, want %q", tt.in, got, tt.want)
+		}
 	}
 }
