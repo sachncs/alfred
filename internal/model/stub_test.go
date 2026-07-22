@@ -93,6 +93,57 @@ func TestStubClientRecordsRequest(t *testing.T) {
 	assert.Equal(t, "test-model", reqs[0].Model)
 }
 
+// ponytail: ScriptedChatClient defaults to 2 scripts so a smoke test and one
+// runtime caller both get a response. If this breaks, the "boot smoke + HTTP
+// turn gets an empty stream" bug returns.
+func TestScriptedChatClientDefaultsToTwoScripts(t *testing.T) {
+	t.Parallel()
+	client := model.ScriptedChatClient("ok")
+
+	for i := 0; i < 2; i++ {
+		ch, err := client.Stream(context.Background(), model.Request{})
+		require.NoError(t, err)
+		var got string
+		var done bool
+		for chunk := range ch {
+			if chunk.DeltaText != "" {
+				got += chunk.DeltaText
+			}
+			if chunk.Done {
+				done = true
+			}
+		}
+		require.True(t, done, "call %d: stream never finished", i)
+		assert.Equal(t, "ok", got, "call %d: text mismatch", i)
+	}
+
+	// Third call should fall back to the empty-script Done chunk.
+	ch, err := client.Stream(context.Background(), model.Request{})
+	require.NoError(t, err)
+	for chunk := range ch {
+		require.True(t, chunk.Done, "third call should emit Done")
+	}
+}
+
+func TestScriptedChatClientN(t *testing.T) {
+	t.Parallel()
+	client := model.ScriptedChatClientN("ok", 5)
+	for i := 0; i < 5; i++ {
+		ch, err := client.Stream(context.Background(), model.Request{})
+		require.NoError(t, err)
+		var got string
+		for chunk := range ch {
+			if chunk.DeltaText != "" {
+				got += chunk.DeltaText
+			}
+			if chunk.Done {
+				break
+			}
+		}
+		assert.Equal(t, "ok", got, "call %d", i)
+	}
+}
+
 func TestRequestJSONRoundTrip(t *testing.T) {
 	t.Parallel()
 	req := model.Request{

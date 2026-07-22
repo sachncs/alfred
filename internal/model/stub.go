@@ -64,11 +64,25 @@ func (c *StubClient) Requests() []Request {
 
 // ScriptedChatClient is a higher-level StubClient that emits a single
 // assistant text turn. Useful for "happy path" tests.
+//
+// Defaults to 2 scripts so a boot-time smoke test and one runtime caller
+// both get a response without manual wiring.
+// ponytail: 2 = smoke test + first HTTP turn; bump with ScriptedChatClientN if more consumers.
 func ScriptedChatClient(text string) *StubClient {
-	return NewStubClient([]StreamChunk{
-		{DeltaText: text},
-		{Done: true},
-	})
+	return ScriptedChatClientN(text, 2)
+}
+
+// ScriptedChatClientN creates a StubClient with n copies of the same script.
+// Use when more than the default number of consumers need a response.
+func ScriptedChatClientN(text string, n int) *StubClient {
+	scripts := make([][]StreamChunk, n)
+	for i := range scripts {
+		scripts[i] = []StreamChunk{
+			{DeltaText: text},
+			{Done: true},
+		}
+	}
+	return NewStubClient(scripts...)
 }
 
 // ScriptedToolCallClient emits a single tool call.

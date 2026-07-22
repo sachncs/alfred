@@ -72,11 +72,8 @@ func main() {
 	readTool := fs.NewReadTool()
 	writeTool := fs.NewWriteTool()
 	editTool := fs.NewEditTool()
-	// ponytail: scripted client supplies multiple rounds so smoke test + HTTP turn both get a script
-	stubClient := model.NewStubClient(
-		[]model.StreamChunk{{DeltaText: "hello from alfred"}, {Done: true}},
-		[]model.StreamChunk{{DeltaText: "hello from alfred"}, {Done: true}},
-	)
+	// ponytail: ScriptedChatClient defaults to 2 scripts — smoke test + HTTP turn both get a response
+	stubClient := model.ScriptedChatClient("hello from alfred")
 
 	chat := agent.NewChatAgent("alfred.chat", "You are Alfred, a helpful research assistant.", stubClient)
 	chat.RegisterTool(readTool)
