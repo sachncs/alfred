@@ -72,7 +72,11 @@ func main() {
 	readTool := fs.NewReadTool()
 	writeTool := fs.NewWriteTool()
 	editTool := fs.NewEditTool()
-	stubClient := model.ScriptedChatClient("hello from alfred")
+	// ponytail: scripted client supplies multiple rounds so smoke test + HTTP turn both get a script
+	stubClient := model.NewStubClient(
+		[]model.StreamChunk{{DeltaText: "hello from alfred"}, {Done: true}},
+		[]model.StreamChunk{{DeltaText: "hello from alfred"}, {Done: true}},
+	)
 
 	chat := agent.NewChatAgent("alfred.chat", "You are Alfred, a helpful research assistant.", stubClient)
 	chat.RegisterTool(readTool)
@@ -86,6 +90,7 @@ func main() {
 
 	// 6. Runtime
 	rt := runtime.NewAlfredRuntime(cfg.BearerToken, threadStore, sessionStore)
+	rt.SetModelClient(stubClient)
 	rt.RegisterTool(readTool)
 	rt.RegisterTool(writeTool)
 	rt.RegisterTool(editTool)

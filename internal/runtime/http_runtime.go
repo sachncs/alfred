@@ -19,6 +19,7 @@ type HTTPRuntime struct {
 	bearerToken  string
 	threadStore  ThreadStore
 	sessionStore SessionStore
+	parent       any // ponytail: outer runtime (e.g. *AlfredRuntime) for context lookup
 }
 
 // NewHTTPRuntime creates an HTTPRuntime with the given bearer token.

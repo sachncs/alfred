@@ -1,12 +1,15 @@
 package runtime
 
 import (
+	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"sync"
 
 	"github.com/alfred/alfred/internal/contract"
+	"github.com/alfred/alfred/internal/model"
 )
 
 // SSEEvent is a server-sent event.
@@ -19,6 +22,7 @@ type SSEEvent struct {
 // AlfredRuntime is a level-4 runtime that adds SSE streaming and replay buffers.
 type AlfredRuntime struct {
 	*LocalRuntime
+	client    model.Client
 	replayMu  sync.RWMutex
 	replayBuf map[contract.ThreadID][]SSEEvent
 	subsMu    sync.RWMutex
@@ -32,12 +36,27 @@ func NewAlfredRuntime(bearerToken string, ts ThreadStore, ss SessionStore) *Alfr
 		replayBuf:    make(map[contract.ThreadID][]SSEEvent),
 		subs:         make(map[contract.ThreadID][]chan SSEEvent),
 	}
+	rt.parent = rt
 	rt.setupSSERoutes()
 	return rt
 }
 
+// SetModelClient sets the model client used for turn execution.
+func (r *AlfredRuntime) SetModelClient(c model.Client) { r.client = c }
+
 func (r *AlfredRuntime) setupSSERoutes() {
 	r.mux.HandleFunc("GET /v1/threads/{id}/events", r.handleSSE)
+}
+
+// RunTurn creates a TurnLoop with the runtime's model client and tools,
+// and runs the turn to completion. Returns the final turn.
+func (r *AlfredRuntime) RunTurn(ctx context.Context, thread *contract.Thread, input contract.UserInput) (*contract.Turn, error) {
+	if r.client == nil {
+		return nil, errors.New("no model client configured")
+	}
+	tools := r.Tools()
+	loop := NewTurnLoop(r.client, tools, r.ThreadStore(), r.PublishEvent)
+	return loop.RunTurn(ctx, thread, input)
 }
 
 func (r *AlfredRuntime) handleSSE(w http.ResponseWriter, req *http.Request) {
@@ -53,7 +72,6 @@ func (r *AlfredRuntime) handleSSE(w http.ResponseWriter, req *http.Request) {
 	w.Header().Set("Cache-Control", "no-cache")
 	w.Header().Set("Connection", "keep-alive")
 
-	// Send replay buffer.
 	r.replayMu.RLock()
 	events := r.replayBuf[id]
 	r.replayMu.RUnlock()
@@ -63,7 +81,6 @@ func (r *AlfredRuntime) handleSSE(w http.ResponseWriter, req *http.Request) {
 		flusher.Flush()
 	}
 
-	// Subscribe for new events.
 	ch := make(chan SSEEvent, 64)
 	r.subsMu.Lock()
 	r.subs[id] = append(r.subs[id], ch)

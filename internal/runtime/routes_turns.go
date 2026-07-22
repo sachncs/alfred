@@ -1,6 +1,7 @@
 package runtime
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"time"
@@ -30,9 +31,57 @@ func (r *LocalRuntime) handleStartTurn(w http.ResponseWriter, req *http.Request)
 		Items:     []contract.TurnItem{},
 	}
 
+	if ar, ok := r.parentAlfred(); ok {
+		// ponytail: detached context — turn outlives the HTTP request
+		go r.executeTurn(context.Background(), ar, th, in.Input)
+	}
+
 	RouteJSON(w, contract.StartTurnResponse{Turn: *turn}, 202)
 }
 
 func (r *LocalRuntime) handleGetTurn(w http.ResponseWriter, req *http.Request) {
-	RouteJSON(w, map[string]string{"status": "not_implemented"}, 501)
+	turnID := contract.TurnID(req.PathValue("turnId"))
+	id := contract.ThreadID(req.PathValue("id"))
+
+	items, err := r.SessionStore().Read(id, 0)
+	if err != nil {
+		RouteError(w, contract.CodeInternal, err.Error(), 500)
+		return
+	}
+
+	if len(items) == 0 {
+		RouteJSON(w, map[string]any{
+			"id":       turnID,
+			"threadId": id,
+			"status":   contract.TurnStatusQueued,
+			"items":    []contract.TurnItem{},
+		}, 200)
+		return
+	}
+
+	RouteJSON(w, contract.Turn{
+		ID:       turnID,
+		ThreadID: id,
+		Status:   contract.TurnStatusCompleted,
+		Items:    items,
+	}, 200)
+}
+
+// parentAlfred returns the AlfredRuntime if this LocalRuntime is embedded in one.
+func (r *LocalRuntime) parentAlfred() (*AlfredRuntime, bool) {
+	if ar, ok := r.parent.(*AlfredRuntime); ok {
+		return ar, true
+	}
+	return nil, false
+}
+
+// executeTurn runs the turn loop and persists items to the session store.
+func (r *LocalRuntime) executeTurn(ctx context.Context, ar *AlfredRuntime, thread *contract.Thread, input contract.UserInput) {
+	turn, err := ar.RunTurn(ctx, thread, input)
+	if turn != nil && len(turn.Items) > 0 {
+		_ = r.SessionStore().Append(thread.ID, turn.Items)
+	}
+	if err != nil {
+		ar.PublishEvent(thread.ID, SSEEvent{Event: "turn.failed", Data: map[string]string{"error": err.Error()}})
+	}
 }
