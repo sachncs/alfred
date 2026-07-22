@@ -10,6 +10,7 @@ import (
 
 	"github.com/alfred/alfred/internal/contract"
 	"github.com/alfred/alfred/internal/model"
+	"github.com/alfred/alfred/internal/store"
 )
 
 // SSEEvent is a server-sent event.
@@ -39,6 +40,12 @@ func NewAlfredRuntime(bearerToken string, ts ThreadStore, ss SessionStore) *Alfr
 	rt.parent = rt
 	rt.setupSSERoutes()
 	return rt
+}
+
+// NewAlfredRuntimeWithHybrid creates an AlfredRuntime backed by a hybrid
+// (SQLite + JSONL) thread store.
+func NewAlfredRuntimeWithHybrid(bearerToken string, hybrid *store.HybridThreadStore) *AlfredRuntime {
+	return NewAlfredRuntime(bearerToken, hybrid, hybrid)
 }
 
 // SetModelClient sets the model client used for turn execution.

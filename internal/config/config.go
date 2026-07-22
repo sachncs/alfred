@@ -5,6 +5,7 @@ package config
 import (
 	"flag"
 	"os"
+	"path/filepath"
 	"strconv"
 )
 
@@ -14,14 +15,17 @@ type Config struct {
 	Version       string
 	WorkspaceRoot string
 	BearerToken   string
+	DBPath        string
 }
 
 // Defaults returns a Config with production defaults.
 func Defaults() Config {
+	home, _ := os.UserHomeDir()
 	return Config{
 		Port:          8899,
-		Version:       "0.2.0-phase2",
+		Version:       "0.3.0-phase3",
 		WorkspaceRoot: ".",
+		DBPath:        filepath.Join(home, ".alfred", "alfred.db"),
 	}
 }
 
@@ -31,6 +35,7 @@ func ParseFlags() Config {
 	cfg := Defaults()
 	flag.IntVar(&cfg.Port, "port", cfg.Port, "HTTP server port")
 	flag.StringVar(&cfg.WorkspaceRoot, "workspace-root", cfg.WorkspaceRoot, "workspace root directory")
+	flag.StringVar(&cfg.DBPath, "db-path", cfg.DBPath, "SQLite database path")
 	showVersion := flag.Bool("version", false, "print version and exit")
 	flag.Parse()
 	if *showVersion {
@@ -51,5 +56,8 @@ func (c *Config) ApplyEnv() {
 	}
 	if v := os.Getenv("ALFRED_BEARER_TOKEN"); v != "" {
 		c.BearerToken = v
+	}
+	if v := os.Getenv("ALFRED_DB_PATH"); v != "" {
+		c.DBPath = v
 	}
 }

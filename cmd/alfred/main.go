@@ -8,6 +8,7 @@ import (
 	"log"
 	"os"
 	"os/signal"
+	"path/filepath"
 	"syscall"
 	"time"
 
@@ -22,7 +23,7 @@ import (
 	"github.com/alfred/alfred/internal/store"
 )
 
-const version = "0.2.0-phase2"
+const version = "0.3.0-phase3"
 
 func main() {
 	showVersion := flag.Bool("version", false, "print version and exit")
@@ -37,7 +38,7 @@ func main() {
 
 	cfg := config.Defaults()
 	cfg.ApplyEnv()
-	log.Printf("alfred %s starting on port %d", version, cfg.Port)
+	log.Printf("alfred %s starting on port %d (db=%s)", version, cfg.Port, cfg.DBPath)
 
 	// 1. Capability broker
 	broker := capability.NewBroker()
@@ -58,17 +59,27 @@ func main() {
 		},
 	))
 
-	// 3. Stores
-	threadStore, err := store.NewFileThreadStore(cfg.WorkspaceRoot)
+	// 3. Hybrid (SQLite + JSONL) thread store.
+	eventsDir := filepath.Join(filepath.Dir(cfg.DBPath), "events")
+	hybrid, err := store.NewHybridThreadStore(cfg.DBPath, eventsDir)
 	if err != nil {
-		log.Fatalf("thread store: %v", err)
+		log.Fatalf("hybrid store: %v", err)
 	}
-	sessionStore, err := store.NewFileSessionStore(cfg.WorkspaceRoot)
-	if err != nil {
-		log.Fatalf("session store: %v", err)
+	defer func() { _ = hybrid.Close() }()
+	sqlitePath, jsonlDir := hybrid.Addr()
+	log.Printf("hybrid store ready: sqlite=%s jsonl=%s", sqlitePath, jsonlDir)
+
+	// 4. Migration: legacy JSONL + ~/.kun.
+	if err := store.MigrateFromJSONL(hybrid, cfg.WorkspaceRoot); err != nil {
+		log.Printf("jsonl migration warning: %v", err)
+	}
+	if home, err := os.UserHomeDir(); err == nil {
+		if err := store.MigrateLegacyKun(hybrid.SQLite(), home); err != nil {
+			log.Printf("kun migration: %v", err)
+		}
 	}
 
-	// 4. ChatAgent + tools
+	// 5. ChatAgent + tools
 	readTool := fs.NewReadTool()
 	writeTool := fs.NewWriteTool()
 	editTool := fs.NewEditTool()
@@ -81,19 +92,19 @@ func main() {
 	chat.RegisterTool(editTool)
 	log.Printf("chat agent ready: id=%s tools=%d", chat.ID(), len(chat.Tools()))
 
-	// 5. Wire bridge
+	// 6. Wire bridge
 	bridge := runtime.NewAgentBridge(chat)
 	_ = bridge
 
-	// 6. Runtime
-	rt := runtime.NewAlfredRuntime(cfg.BearerToken, threadStore, sessionStore)
+	// 7. Runtime backed by hybrid store
+	rt := runtime.NewAlfredRuntimeWithHybrid(cfg.BearerToken, hybrid)
 	rt.SetModelClient(stubClient)
 	rt.RegisterTool(readTool)
 	rt.RegisterTool(writeTool)
 	rt.RegisterTool(editTool)
 	log.Printf("runtime ready")
 
-	// 7. Smoke-test the agent
+	// 8. Smoke-test the agent
 	if err := smokeTest(chat); err != nil {
 		log.Printf("smoke test failed: %v", err)
 	} else {
@@ -103,7 +114,7 @@ func main() {
 	log.Printf("ready (Ctrl-C to exit)")
 	fmt.Println("READY")
 
-	// 8. Start HTTP server in background
+	// 9. Start HTTP server in background
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
@@ -113,7 +124,7 @@ func main() {
 		}
 	}()
 
-	// 9. Wait for SIGINT / SIGTERM
+	// 10. Wait for SIGINT / SIGTERM
 	sigCh := make(chan os.Signal, 1)
 	signal.Notify(sigCh, syscall.SIGINT, syscall.SIGTERM)
 	sig := <-sigCh
