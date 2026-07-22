@@ -29,10 +29,17 @@ func NewTurnLoop(client model.Client, tools []tool.Tool, ts ThreadStore, evFn fu
 	return &TurnLoop{client: client, tools: tm, store: ts, events: evFn}
 }
 
-// RunTurn executes a complete turn: streams from the model, dispatches
-// tool calls, and repeats until the model returns without tool calls.
+// RunTurn executes a complete turn, generating a new turn ID.
 func (l *TurnLoop) RunTurn(ctx context.Context, thread *contract.Thread, input contract.UserInput) (*contract.Turn, error) {
-	turnID := contract.TurnID(fmt.Sprintf("turn-%d", time.Now().UnixNano()))
+	return l.RunTurnWithID(ctx, thread, input, "")
+}
+
+// RunTurnWithID executes a turn using the given turn ID. If turnID is empty,
+// a new one is generated.
+func (l *TurnLoop) RunTurnWithID(ctx context.Context, thread *contract.Thread, input contract.UserInput, turnID contract.TurnID) (*contract.Turn, error) {
+	if turnID == "" {
+		turnID = contract.TurnID(fmt.Sprintf("turn-%d", time.Now().UnixNano()))
+	}
 	turn := &contract.Turn{
 		ID:        turnID,
 		ThreadID:  thread.ID,
@@ -51,6 +58,7 @@ func (l *TurnLoop) RunTurn(ctx context.Context, thread *contract.Thread, input c
 		Kind:      contract.ItemKindUserMessage,
 		CreatedAt: time.Now().UTC(),
 		Text:      &userText,
+		Metadata:  map[string]any{"turnId": string(turnID)},
 	})
 
 	l.emit(thread.ID, SSEEvent{Event: "turn.started", Data: turn})
@@ -115,6 +123,7 @@ func (l *TurnLoop) RunTurn(ctx context.Context, thread *contract.Thread, input c
 				Kind:      contract.ItemKindAssistantText,
 				CreatedAt: time.Now().UTC(),
 				Text:      &t,
+				Metadata:  map[string]any{"turnId": string(turnID)},
 			})
 			messages = append(messages, model.Message{Role: "assistant", Content: t})
 		}
@@ -163,6 +172,7 @@ func (l *TurnLoop) dispatchTool(ctx context.Context, turnID contract.TurnID, tc 
 			ID:        itemID,
 			Kind:      contract.ItemKindToolResult,
 			CreatedAt: now,
+			Metadata:  map[string]any{"turnId": string(turnID)},
 			ToolCall: &contract.ToolCall{
 				ID:    contract.ToolCallID(tc.ID),
 				Name:  tc.Name,
@@ -179,6 +189,7 @@ func (l *TurnLoop) dispatchTool(ctx context.Context, turnID contract.TurnID, tc 
 		ID:        itemID,
 		Kind:      contract.ItemKindToolResult,
 		CreatedAt: now,
+		Metadata:  map[string]any{"turnId": string(turnID)},
 		ToolCall: &contract.ToolCall{
 			ID:    contract.ToolCallID(tc.ID),
 			Name:  tc.Name,

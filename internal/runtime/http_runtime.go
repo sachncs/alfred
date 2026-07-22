@@ -19,6 +19,11 @@ type HTTPRuntime struct {
 	bearerToken  string
 	threadStore  ThreadStore
 	sessionStore SessionStore
+	memoryStore  *MemoryStore
+	skillsLoader *SkillsLoader
+	usageTracker *UsageTracker
+	approvals    *ApprovalStore
+	attachments  *AttachmentStore
 	parent       any // ponytail: outer runtime (e.g. *AlfredRuntime) for context lookup
 }
 
@@ -30,10 +35,45 @@ func NewHTTPRuntime(bearerToken string, ts ThreadStore, ss SessionStore) *HTTPRu
 		bearerToken:  bearerToken,
 		threadStore:  ts,
 		sessionStore: ss,
+		memoryStore:  NewMemoryStore(),
+		skillsLoader: NewSkillsLoader(),
+		usageTracker: NewUsageTracker(),
+		approvals:    NewApprovalStore(),
+		attachments:  NewAttachmentStore(),
 	}
 	r.setupRoutes()
 	return r
 }
+
+// SetMemoryStore replaces the memory store (used by tests; production wires via NewHTTPRuntime).
+func (r *HTTPRuntime) SetMemoryStore(m *MemoryStore) { r.memoryStore = m }
+
+// SetSkillsLoader replaces the skills loader.
+func (r *HTTPRuntime) SetSkillsLoader(s *SkillsLoader) { r.skillsLoader = s }
+
+// SetUsageTracker replaces the usage tracker.
+func (r *HTTPRuntime) SetUsageTracker(u *UsageTracker) { r.usageTracker = u }
+
+// SetApprovalStore replaces the approval store.
+func (r *HTTPRuntime) SetApprovalStore(a *ApprovalStore) { r.approvals = a }
+
+// SetAttachmentStore replaces the attachment store.
+func (r *HTTPRuntime) SetAttachmentStore(a *AttachmentStore) { r.attachments = a }
+
+// MemoryStore returns the memory store.
+func (r *HTTPRuntime) MemoryStore() *MemoryStore { return r.memoryStore }
+
+// SkillsLoader returns the skills loader.
+func (r *HTTPRuntime) SkillsLoader() *SkillsLoader { return r.skillsLoader }
+
+// UsageTracker returns the usage tracker.
+func (r *HTTPRuntime) UsageTracker() *UsageTracker { return r.usageTracker }
+
+// ApprovalStore returns the approval store.
+func (r *HTTPRuntime) ApprovalStore() *ApprovalStore { return r.approvals }
+
+// AttachmentStore returns the attachment store.
+func (r *HTTPRuntime) AttachmentStore() *AttachmentStore { return r.attachments }
 
 func (r *HTTPRuntime) setupRoutes() {
 	r.mux.HandleFunc("GET /health", r.handleHealth)
@@ -43,7 +83,7 @@ func (r *HTTPRuntime) setupRoutes() {
 func (r *HTTPRuntime) handleHealth(w http.ResponseWriter, req *http.Request) {
 	resp := contract.HealthResponse{
 		Status:    "ok",
-		Version:   "0.2.0-phase2",
+		Version:   "0.3.0-phase3",
 		Timestamp: time.Now().UTC(),
 	}
 	w.Header().Set("Content-Type", "application/json")

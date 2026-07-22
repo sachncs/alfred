@@ -20,9 +20,16 @@ type SkillsLoader struct {
 	workspaceRoot string
 }
 
-// NewSkillsLoader creates a loader for the given workspace.
-func NewSkillsLoader(workspaceRoot string) *SkillsLoader {
-	return &SkillsLoader{workspaceRoot: workspaceRoot}
+// NewSkillsLoader creates a loader rooted at the current directory.
+// ponytail: zero-arg constructor so HTTPRuntime can hold one unconditionally;
+// call SetWorkspaceRoot before use to point at the actual workspace.
+func NewSkillsLoader() *SkillsLoader {
+	return &SkillsLoader{workspaceRoot: "."}
+}
+
+// SetWorkspaceRoot sets the directory skills are loaded from.
+func (l *SkillsLoader) SetWorkspaceRoot(root string) {
+	l.workspaceRoot = root
 }
 
 // ListSkills returns all available skills in the workspace.

@@ -17,7 +17,8 @@ import (
 //   - <threadID>.jsonl: one contract.TurnItem per line (Phase 2 layout)
 //
 // Idempotent: a thread already in SQLite is skipped.
-// Threads are imported first, then events — the events table has a FK to threads.
+// Orphan event files (events without a matching threads.jsonl row) create
+// a placeholder thread so no event is silently dropped.
 func MigrateFromJSONL(hybrid *HybridThreadStore, srcDir string) error {
 	existing := map[string]bool{}
 	if list, _, err := hybrid.List(10000, ""); err == nil {
@@ -39,7 +40,8 @@ func MigrateFromJSONL(hybrid *HybridThreadStore, srcDir string) error {
 		}
 	}
 
-	// Walk all <id>.jsonl files (skipping threads.jsonl).
+	// Walk all <id>.jsonl files (skipping threads.jsonl). For each orphan
+	// event file, create a placeholder thread so the events have a parent.
 	entries, err := os.ReadDir(srcDir)
 	if err != nil {
 		return err
@@ -53,6 +55,29 @@ func MigrateFromJSONL(hybrid *HybridThreadStore, srcDir string) error {
 			continue
 		}
 		threadID := contract.ThreadID(name[:len(name)-len(".jsonl")])
+		// Idempotency: if this thread already exists AND has events, skip.
+		if existing[string(threadID)] {
+			if events, _ := hybrid.ReadEvents(threadID, 0); len(events) > 0 {
+				continue
+			}
+		}
+		if !existing[string(threadID)] {
+			placeholder := &contract.Thread{
+				ID:        threadID,
+				Title:     "(recovered from orphan events)",
+				Status:    contract.ThreadStatusIdle,
+				CreatedAt: time.Now().UTC(),
+				UpdatedAt: time.Now().UTC(),
+				Metadata: map[string]any{
+					"recovered":    true,
+					"recovered_at": time.Now().UTC().Format(time.RFC3339),
+				},
+			}
+			if err := hybrid.Create(placeholder); err != nil {
+				return err
+			}
+			existing[string(threadID)] = true
+		}
 		if err := migrateEvents(hybrid, threadID, filepath.Join(srcDir, name)); err != nil {
 			return err
 		}
@@ -110,8 +135,7 @@ func migrateEvents(hybrid *HybridThreadStore, threadID contract.ThreadID, path s
 	if err := scanner.Err(); err != nil {
 		return err
 	}
-	// ponytail: skip events for threads that don't exist — they're orphan files
-	if _, err := hybrid.Get(threadID); err != nil {
+	if len(items) == 0 {
 		return nil
 	}
 	return hybrid.AppendEvents(threadID, items)

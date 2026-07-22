@@ -7,12 +7,14 @@ import (
 // LocalRuntime is a level-3 runtime that wires all /v1/ routes.
 type LocalRuntime struct {
 	*HTTPRuntime
+	userInputs *UserInputStore
 }
 
 // NewLocalRuntime creates a LocalRuntime with all routes wired.
 func NewLocalRuntime(bearerToken string, ts ThreadStore, ss SessionStore) *LocalRuntime {
 	rt := &LocalRuntime{
 		HTTPRuntime: NewHTTPRuntime(bearerToken, ts, ss),
+		userInputs:  NewUserInputStore(),
 	}
 	rt.setupV1Routes()
 	return rt
@@ -35,6 +37,7 @@ func (r *LocalRuntime) setupV1Routes() {
 	mux.HandleFunc("GET /v1/sessions/{id}", r.handleGetSession)
 
 	// Approvals
+	mux.HandleFunc("GET /v1/approvals", r.handleListApprovals)
 	mux.HandleFunc("POST /v1/approvals/{id}/resolve", r.handleResolveApproval)
 
 	// User inputs

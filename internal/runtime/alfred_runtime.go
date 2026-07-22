@@ -58,12 +58,18 @@ func (r *AlfredRuntime) setupSSERoutes() {
 // RunTurn creates a TurnLoop with the runtime's model client and tools,
 // and runs the turn to completion. Returns the final turn.
 func (r *AlfredRuntime) RunTurn(ctx context.Context, thread *contract.Thread, input contract.UserInput) (*contract.Turn, error) {
+	return r.RunTurnWithID(ctx, thread, input, "")
+}
+
+// RunTurnWithID is like RunTurn but uses the supplied turn ID instead of
+// generating a new one. Used by HTTP routes that pre-allocate the ID.
+func (r *AlfredRuntime) RunTurnWithID(ctx context.Context, thread *contract.Thread, input contract.UserInput, turnID contract.TurnID) (*contract.Turn, error) {
 	if r.client == nil {
 		return nil, errors.New("no model client configured")
 	}
 	tools := r.Tools()
 	loop := NewTurnLoop(r.client, tools, r.ThreadStore(), r.PublishEvent)
-	return loop.RunTurn(ctx, thread, input)
+	return loop.RunTurnWithID(ctx, thread, input, turnID)
 }
 
 func (r *AlfredRuntime) handleSSE(w http.ResponseWriter, req *http.Request) {

@@ -26,7 +26,8 @@ import (
 const version = "0.3.0-phase3"
 
 func main() {
-	showVersion := flag.Bool("version", false, "print version and exit")
+	cfg := config.Defaults()
+	showVersion := config.RegisterFlags(&cfg)
 	flag.Parse()
 
 	if *showVersion {
@@ -34,10 +35,8 @@ func main() {
 		return
 	}
 
-	log.SetFlags(log.LstdFlags | log.Lmicroseconds)
-
-	cfg := config.Defaults()
 	cfg.ApplyEnv()
+	log.SetFlags(log.LstdFlags | log.Lmicroseconds)
 	log.Printf("alfred %s starting on port %d (db=%s)", version, cfg.Port, cfg.DBPath)
 
 	// 1. Capability broker

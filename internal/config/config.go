@@ -29,19 +29,13 @@ func Defaults() Config {
 	}
 }
 
-// ParseFlags populates a Config from command-line flags.
-// Call after flag.Parse() or use flag.CommandLine.
-func ParseFlags() Config {
-	cfg := Defaults()
+// RegisterFlags binds CLI flags to cfg and returns the --version pointer.
+// Callers should flag.Parse() then check *showVersion.
+func RegisterFlags(cfg *Config) *bool {
 	flag.IntVar(&cfg.Port, "port", cfg.Port, "HTTP server port")
 	flag.StringVar(&cfg.WorkspaceRoot, "workspace-root", cfg.WorkspaceRoot, "workspace root directory")
 	flag.StringVar(&cfg.DBPath, "db-path", cfg.DBPath, "SQLite database path")
-	showVersion := flag.Bool("version", false, "print version and exit")
-	flag.Parse()
-	if *showVersion {
-		cfg.Port = -1 // sentinel: caller should print version and exit
-	}
-	return cfg
+	return flag.Bool("version", false, "print version and exit")
 }
 
 // ApplyEnv overrides Config fields with environment variables.
