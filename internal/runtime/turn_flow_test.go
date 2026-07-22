@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"io"
+	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
@@ -16,8 +18,9 @@ import (
 
 // slowClient emits a DeltaText chunk after a delay. If the context is cancelled
 // before the delay elapses, no chunks are emitted — that's the hook for the
-// detached-context test: req.Context() is cancelled when ServeHTTP returns,
-// so a goroutine using it never gets to emit. context.Background() survives.
+// detached-context test: real net/http cancels the request context once the
+// response is finished, so a goroutine using req.Context() never gets to emit.
+// context.Background() survives.
 type slowClient struct {
 	text  string
 	delay time.Duration
@@ -47,6 +50,19 @@ func newAlfredWithClient(t *testing.T, client model.Client) *AlfredRuntime {
 	rt := NewAlfredRuntime("", ts, ss)
 	rt.SetModelClient(client)
 	return rt
+}
+
+// httpPost is a tiny helper that POSTs JSON to the test server and returns the body.
+func httpPost(t *testing.T, url string, v any) (*http.Response, []byte) {
+	t.Helper()
+	body, _ := json.Marshal(v)
+	resp, err := http.Post(url, "application/json", bytes.NewReader(body))
+	if err != nil {
+		t.Fatalf("POST %s: %v", url, err)
+	}
+	respBody, _ := io.ReadAll(resp.Body)
+	_ = resp.Body.Close()
+	return resp, respBody
 }
 
 func TestAlfredRuntimeTurnFlow(t *testing.T) {
@@ -134,50 +150,40 @@ func TestAlfredRuntimeTurnFlowNoClient(t *testing.T) {
 // handleStartTurn survives the request context being cancelled.
 //
 // Mechanism: the slowClient sleeps before emitting its DeltaText chunk and
-// checks ctx.Err() between sends. The test cancels the request context after
-// ServeHTTP returns (simulating what real net/http does when the response is
-// flushed — the request context is cancelled). If executeTurn passed
-// req.Context() into TurnLoop, that context is now cancelled — the sleep
-// completes, ctx.Err() is non-nil, and no chunks are emitted, so the
-// assistant text never lands in the session store.
+// checks ctx.Err() between sends. We POST through a real httptest.NewServer
+// (not NewRecorder) because real net/http cancels the request context once
+// the response is finished — NewRecorder does not. If executeTurn passed
+// req.Context() into TurnLoop, that context is cancelled by the time the
+// goroutine runs, the slowClient sees ctx.Err() != nil, and emits nothing.
 //
 // The fix is executeTurn using context.Background() so the goroutine outlives
 // the HTTP request. If this test ever fails (no assistant text in the store),
 // someone reintroduced req.Context() into the goroutine.
-//
-// ponytail: httptest.NewRequest does not cancel its context when ServeHTTP
-// returns (no real client to disconnect from), so we cancel manually.
 func TestAlfredRuntimeTurnDetachedContext(t *testing.T) {
 	client := &slowClient{text: "detached-context-ok", delay: 80 * time.Millisecond}
 	rt := newAlfredWithClient(t, client)
 
-	body, _ := json.Marshal(contract.CreateThreadRequest{Title: "detached-ctx"})
-	req := httptest.NewRequest("POST", "/v1/threads", bytes.NewReader(body))
-	w := httptest.NewRecorder()
-	rt.Handler().ServeHTTP(w, req)
+	// ponytail: real HTTP server so request context cancellation matches production
+	server := httptest.NewServer(rt.Handler())
+	defer server.Close()
+
+	resp, body := httpPost(t, server.URL+"/v1/threads", contract.CreateThreadRequest{Title: "detached-ctx"})
+	if resp.StatusCode != 201 {
+		t.Fatalf("create thread: %d, body=%s", resp.StatusCode, body)
+	}
 	var createResp contract.CreateThreadResponse
-	_ = json.NewDecoder(w.Body).Decode(&createResp)
+	if err := json.Unmarshal(body, &createResp); err != nil {
+		t.Fatalf("decode create: %v", err)
+	}
 	threadID := createResp.Thread.ID
 
-	turnBody, _ := json.Marshal(contract.StartTurnRequest{
-		Input: contract.UserInput{Text: "hi"},
-	})
-	req = httptest.NewRequest("POST", "/v1/threads/"+string(threadID)+"/turns", bytes.NewReader(turnBody))
-	req.Header.Set("Content-Type", "application/json")
-	// ponytail: build a cancellable context so we can simulate real-http cancellation
-	ctx, cancel := context.WithCancel(req.Context())
-	req = req.WithContext(ctx)
-	w = httptest.NewRecorder()
-	rt.Handler().ServeHTTP(w, req)
-	if w.Code != 202 {
-		t.Fatalf("start turn: %d, want 202", w.Code)
+	resp, body = httpPost(t, server.URL+"/v1/threads/"+string(threadID)+"/turns",
+		contract.StartTurnRequest{Input: contract.UserInput{Text: "hi"}})
+	if resp.StatusCode != 202 {
+		t.Fatalf("start turn: %d, want 202, body=%s", resp.StatusCode, body)
 	}
-	// Simulate real net/http cancelling the request context when the
-	// response is flushed — without this, the goroutine using req.Context()
-	// would still see ctx.Err() == nil and accidentally succeed.
-	cancel()
-	// ServeHTTP has now returned and the request context is cancelled.
-	// The goroutine must still be able to complete its work.
+	// Real net/http cancels req.Context() now that the response body is closed.
+	// The goroutine must still complete its work.
 
 	deadline := time.Now().Add(2 * time.Second)
 	var events []contract.TurnItem
