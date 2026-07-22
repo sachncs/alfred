@@ -91,7 +91,7 @@ func TestStdioTransportCloseThenRead(t *testing.T) {
 	t.Parallel()
 	var in, out bytes.Buffer
 	tr := mcp.NewStdioTransport(&in, &out)
-	tr.Close()
+	_ = tr.Close()
 	_, err := tr.ReadMessage(context.Background())
 	if !errors.Is(err, mcp.ErrTransportClosed) {
 		t.Fatalf("expected ErrTransportClosed, got: %v", err)
@@ -102,7 +102,7 @@ func TestStdioTransportCloseThenWrite(t *testing.T) {
 	t.Parallel()
 	var in, out bytes.Buffer
 	tr := mcp.NewStdioTransport(&in, &out)
-	tr.Close()
+	_ = tr.Close()
 	if err := tr.WriteMessage(context.Background(), json.RawMessage(`{}`)); !errors.Is(err, mcp.ErrTransportClosed) {
 		t.Fatalf("expected ErrTransportClosed, got: %v", err)
 	}
@@ -182,7 +182,7 @@ func TestStubServerHandlesInitialize(t *testing.T) {
 		}
 		time.Sleep(10 * time.Millisecond)
 	}
-	tr.Close()
+	_ = tr.Close()
 	wg.Wait()
 
 	outMu.Lock()
@@ -232,7 +232,7 @@ func TestStubServerHandlesParseError(t *testing.T) {
 		}
 		time.Sleep(10 * time.Millisecond)
 	}
-	tr.Close()
+	_ = tr.Close()
 	wg.Wait()
 }
 

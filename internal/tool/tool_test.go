@@ -18,9 +18,9 @@ type stubTool struct {
 	body func(ctx context.Context, input json.RawMessage, tc *tool.Context) (*tool.Result, error)
 }
 
-func (s *stubTool) Name() string                   { return s.name }
-func (s *stubTool) Description() string            { return "stub for tests" }
-func (s *stubTool) Schema() json.RawMessage         { return json.RawMessage(`{"type":"object"}`) }
+func (s *stubTool) Name() string            { return s.name }
+func (s *stubTool) Description() string     { return "stub for tests" }
+func (s *stubTool) Schema() json.RawMessage { return json.RawMessage(`{"type":"object"}`) }
 func (s *stubTool) Execute(ctx context.Context, input json.RawMessage, tc *tool.Context) (*tool.Result, error) {
 	return s.body(ctx, input, tc)
 }
@@ -28,7 +28,7 @@ func (s *stubTool) Execute(ctx context.Context, input json.RawMessage, tc *tool.
 // Compile-time interface conformance check.
 var _ tool.Tool = (*stubTool)(nil)
 
-func TestInterfaceConformance(t *testing.T) {
+func TestInterfaceConformance(_ *testing.T) {
 	var _ tool.Tool = &stubTool{name: "stub"}
 }
 
@@ -78,7 +78,7 @@ func TestStubToolExecute(t *testing.T) {
 	wg.Add(1)
 	st := &stubTool{
 		name: "echo",
-		body: func(ctx context.Context, input json.RawMessage, tc *tool.Context) (*tool.Result, error) {
+		body: func(_ context.Context, input json.RawMessage, tc *tool.Context) (*tool.Result, error) {
 			called = true
 			if string(input) != `"hi"` {
 				t.Errorf("unexpected input: %s", input)

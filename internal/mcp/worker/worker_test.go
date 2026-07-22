@@ -22,7 +22,9 @@ func newEchoServer() *worker.EchoServer {
 // the test goroutine race-free with the server goroutine.
 func sendAndRecv(t *testing.T, in *lockingBuffer, lockedOut *lockingBuffer, msg string) mcp.JSONRPCResponse {
 	t.Helper()
-	in.WriteString(msg + "\n")
+	if _, err := in.WriteString(msg + "\n"); err != nil {
+		t.Fatalf("write to in: %v", err)
+	}
 	deadline := time.Now().Add(2 * time.Second)
 	for {
 		if time.Now().After(deadline) {
@@ -111,7 +113,7 @@ func TestEchoServerInitialize(t *testing.T) {
 		t.Fatalf("protocolVersion wrong: %v", res)
 	}
 
-	tr.Close()
+	_ = tr.Close()
 	wg.Wait()
 }
 
@@ -147,7 +149,7 @@ func TestEchoServerToolsList(t *testing.T) {
 		t.Fatalf("tool name: %v", t0)
 	}
 
-	tr.Close()
+	_ = tr.Close()
 	wg.Wait()
 }
 
@@ -187,7 +189,7 @@ func TestEchoServerToolsCallSuccess(t *testing.T) {
 		t.Fatalf("expected not error, got isError=true")
 	}
 
-	tr.Close()
+	_ = tr.Close()
 	wg.Wait()
 }
 
@@ -218,7 +220,7 @@ func TestEchoServerToolsCallMissingArgument(t *testing.T) {
 		t.Fatalf("expected isError=true for missing argument")
 	}
 
-	tr.Close()
+	_ = tr.Close()
 	wg.Wait()
 }
 
@@ -248,7 +250,7 @@ func TestEchoServerToolsCallUnknownTool(t *testing.T) {
 		t.Fatalf("expected CodeMethodNotFound, got %d", resp.Error.Code)
 	}
 
-	tr.Close()
+	_ = tr.Close()
 	wg.Wait()
 }
 
@@ -265,7 +267,9 @@ func TestEchoServerShutdown(t *testing.T) {
 		done <- srv.Start(context.Background(), tr)
 	}()
 
-	lockedIn.WriteString(`{"jsonrpc":"2.0","id":6,"method":"shutdown"}` + "\n")
+	if _, err := lockedIn.WriteString(`{"jsonrpc":"2.0","id":6,"method":"shutdown"}` + "\n"); err != nil {
+		t.Fatalf("write to lockedIn: %v", err)
+	}
 
 	select {
 	case err := <-done:
@@ -300,7 +304,7 @@ func TestEchoServerPing(t *testing.T) {
 		t.Fatalf("ping should not error: %+v", resp)
 	}
 
-	tr.Close()
+	_ = tr.Close()
 	wg.Wait()
 }
 
@@ -342,7 +346,7 @@ func TestEchoServerUnknownMethod(t *testing.T) {
 		t.Fatalf("expected CodeMethodNotFound, got %d", resp.Error.Code)
 	}
 
-	tr.Close()
+	_ = tr.Close()
 	wg.Wait()
 }
 
@@ -372,6 +376,6 @@ func TestEchoServerParseError(t *testing.T) {
 		t.Fatalf("expected CodeParseError, got %d", resp.Error.Code)
 	}
 
-	tr.Close()
+	_ = tr.Close()
 	wg.Wait()
 }

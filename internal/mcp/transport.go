@@ -48,18 +48,15 @@ func (t *StdioTransport) ReadMessage(ctx context.Context) (json.RawMessage, erro
 	}
 	done := make(chan result, 1)
 	go func() {
-		for {
-			if !sc.Scan() {
-				if err := sc.Err(); err != nil {
-					done <- result{nil, err}
-					return
-				}
-				done <- result{nil, io.EOF}
+		if !sc.Scan() {
+			if err := sc.Err(); err != nil {
+				done <- result{nil, err}
 				return
 			}
-			done <- result{append([]byte(nil), sc.Bytes()...), nil}
+			done <- result{nil, io.EOF}
 			return
 		}
+		done <- result{append([]byte(nil), sc.Bytes()...), nil}
 	}()
 
 	select {

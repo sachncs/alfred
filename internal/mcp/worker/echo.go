@@ -33,9 +33,13 @@ type echoTool struct{}
 
 func newEchoTool() *echoTool { return &echoTool{} }
 
-func (e *echoTool) Name() string             { return "echo" }
-func (e *echoTool) Description() string      { return "Echoes back the provided message. Useful for smoke testing the MCP transport." }
-func (e *echoTool) Schema() json.RawMessage  { return json.RawMessage(`{"type":"object","properties":{"message":{"type":"string"}},"required":["message"]}`) }
+func (e *echoTool) Name() string { return "echo" }
+func (e *echoTool) Description() string {
+	return "Echoes back the provided message. Useful for smoke testing the MCP transport."
+}
+func (e *echoTool) Schema() json.RawMessage {
+	return json.RawMessage(`{"type":"object","properties":{"message":{"type":"string"}},"required":["message"]}`)
+}
 func (e *echoTool) Execute(ctx context.Context, input json.RawMessage, tc *tool.Context) (*tool.Result, error) {
 	var in EchoInput
 	if len(input) > 0 {

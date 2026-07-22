@@ -153,9 +153,9 @@ func TestAgentStateConcurrent(t *testing.T) {
 // echoTool is a minimal tool.Tool for RegisterAndListTools.
 type echoTool struct{ name string }
 
-func (e *echoTool) Name() string             { return e.name }
-func (e *echoTool) Description() string      { return "echo" }
-func (e *echoTool) Schema() json.RawMessage  { return json.RawMessage(`{}`) }
+func (e *echoTool) Name() string            { return e.name }
+func (e *echoTool) Description() string     { return "echo" }
+func (e *echoTool) Schema() json.RawMessage { return json.RawMessage(`{}`) }
 func (e *echoTool) Execute(ctx context.Context, input json.RawMessage, tc *tool.Context) (*tool.Result, error) {
 	return tool.Success(string(input)), nil
 }

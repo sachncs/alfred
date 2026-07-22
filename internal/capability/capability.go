@@ -30,9 +30,9 @@ type Capability interface {
 
 // Function wraps a plain function as a Capability for simple cases.
 type Function struct {
-	id         ID
-	available  func(ctx context.Context) bool
-	invoke     func(ctx context.Context, input json.RawMessage) (json.RawMessage, error)
+	id        ID
+	available func(ctx context.Context) bool
+	invoke    func(ctx context.Context, input json.RawMessage) (json.RawMessage, error)
 }
 
 // NewFunction constructs a Function capability.

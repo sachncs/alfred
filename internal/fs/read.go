@@ -13,19 +13,19 @@ import (
 
 // ReadInput is the JSON schema for the ReadTool input.
 type ReadInput struct {
-	Path       string `json:"path"`
-	StartLine  int    `json:"startLine,omitempty"`
-	EndLine    int    `json:"endLine,omitempty"`
-	MaxBytes   int    `json:"maxBytes,omitempty"`
+	Path      string `json:"path"`
+	StartLine int    `json:"startLine,omitempty"`
+	EndLine   int    `json:"endLine,omitempty"`
+	MaxBytes  int    `json:"maxBytes,omitempty"`
 }
 
 // ReadOutput is the structured payload returned by ReadTool.
 type ReadOutput struct {
-	Path     string `json:"path"`
-	Size     int64  `json:"size"`
-	MIMEType string `json:"mimeType"`
-	Lines    int    `json:"lines"`
-	Truncated bool  `json:"truncated"`
+	Path      string `json:"path"`
+	Size      int64  `json:"size"`
+	MIMEType  string `json:"mimeType"`
+	Lines     int    `json:"lines"`
+	Truncated bool   `json:"truncated"`
 }
 
 // ReadTool reads a file from the active workspace and returns its

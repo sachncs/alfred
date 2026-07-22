@@ -14,6 +14,10 @@ import (
 // WorkerServer is the abstract base for any concrete MCP worker.
 // It implements Server by holding a name and a static tool catalog;
 // subclasses override catalog construction.
+//
+// abstract base class to distinguish from the concrete EchoServer etc.
+//
+//nolint:revive // stutter warning: WorkerServer is intentional for the
 type WorkerServer struct {
 	id      string
 	tools   []tool.Tool
@@ -71,8 +75,8 @@ func (w *WorkerServer) Start(ctx context.Context, t mcp.Transport) error {
 		case "initialize":
 			resp = mcp.JSONRPCResponse{JSONRPC: "2.0", ID: req.ID, Result: map[string]any{
 				"protocolVersion": "2024-11-05",
-				"serverInfo":       map[string]any{"name": w.id, "version": "0.1.0"},
-				"capabilities":     map[string]any{"tools": map[string]any{}},
+				"serverInfo":      map[string]any{"name": w.id, "version": "0.1.0"},
+				"capabilities":    map[string]any{"tools": map[string]any{}},
 			}}
 		case "tools/list":
 			resp = mcp.JSONRPCResponse{JSONRPC: "2.0", ID: req.ID, Result: map[string]any{
@@ -124,7 +128,7 @@ func (w *WorkerServer) toolList() []map[string]any {
 // handleCall executes a tools/call request by dispatching to the
 // registered tool. The default handler passes through to w.handler if
 // set, otherwise returns an error.
-func (w *WorkerServer) handleCall(ctx context.Context, t mcp.Transport, req mcp.JSONRPCRequest) mcp.JSONRPCResponse {
+func (w *WorkerServer) handleCall(ctx context.Context, _ mcp.Transport, req mcp.JSONRPCRequest) mcp.JSONRPCResponse {
 	var call struct {
 		Name      string          `json:"name"`
 		Arguments json.RawMessage `json:"arguments"`

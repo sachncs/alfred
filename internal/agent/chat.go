@@ -19,11 +19,11 @@ import (
 // Phase 1 implements a single-pass loop (no compaction, no sub-agents).
 // Phase 2 wires the full turn loop; this is the hello-world.
 type ChatAgent struct {
-	id        string
-	state     *AgentState
-	client    model.Client
-	toolsMu   sync.RWMutex
-	tools     map[string]tool.Tool
+	id           string
+	state        *AgentState
+	client       model.Client
+	toolsMu      sync.RWMutex
+	tools        map[string]tool.Tool
 	systemPrompt string
 }
 

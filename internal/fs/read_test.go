@@ -23,7 +23,7 @@ func writeFixture(t *testing.T, dir, name, content string) string {
 }
 
 // helper: build a fresh Context.
-func newCtx(workspace string) context.Context {
+func newCtx(_ string) context.Context {
 	return context.Background()
 }
 

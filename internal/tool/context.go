@@ -2,7 +2,6 @@ package tool
 
 import (
 	"context"
-	"sync"
 )
 
 // Context carries per-call state for a tool invocation. It is built by
@@ -27,8 +26,6 @@ type Context struct {
 
 	// ctx is the parent context for cancellation.
 	ctx context.Context
-
-	once sync.Once
 }
 
 // Approver asks for user approval of a tool action.
@@ -60,7 +57,12 @@ func (c *Context) Context() context.Context {
 
 // WithApprover returns a copy of the Context with the given Approver.
 func (c *Context) WithApprover(a Approver) *Context {
-	clone := *c
-	clone.Approver = a
-	return &clone
+	return &Context{
+		ctx:           c.ctx,
+		ThreadID:      c.ThreadID,
+		TurnID:        c.TurnID,
+		ToolCallID:    c.ToolCallID,
+		WorkspaceRoot: c.WorkspaceRoot,
+		Approver:      a,
+	}
 }

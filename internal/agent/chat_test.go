@@ -19,9 +19,9 @@ type countingTool struct {
 	count int
 }
 
-func (c *countingTool) Name() string             { return c.name }
-func (c *countingTool) Description() string      { return "counting tool" }
-func (c *countingTool) Schema() json.RawMessage  { return json.RawMessage(`{}`) }
+func (c *countingTool) Name() string            { return c.name }
+func (c *countingTool) Description() string     { return "counting tool" }
+func (c *countingTool) Schema() json.RawMessage { return json.RawMessage(`{}`) }
 func (c *countingTool) Execute(ctx context.Context, input json.RawMessage, tc *tool.Context) (*tool.Result, error) {
 	c.count++
 	return tool.SuccessWith("ok", map[string]any{"count": c.count}), nil

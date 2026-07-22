@@ -55,6 +55,7 @@ func (s *AgentState) EndTurn(turnID contract.TurnID, err error) {
 	s.TurnCount++
 	s.LastError = err
 	s.LastTurnAt = time.Now().UTC()
+	_ = turnID // reserved for future per-turn accounting
 }
 
 // Snapshot returns a defensive copy of the state.
@@ -64,8 +65,8 @@ func (s *AgentState) Snapshot() AgentState {
 	return AgentState{
 		CurrentThreadID: s.CurrentThreadID,
 		CurrentTurnID:   s.CurrentTurnID,
-		TurnCount:        s.TurnCount,
-		LastError:        s.LastError,
+		TurnCount:       s.TurnCount,
+		LastError:       s.LastError,
 		LastTurnAt:      s.LastTurnAt,
 		StartedAt:       s.StartedAt,
 	}

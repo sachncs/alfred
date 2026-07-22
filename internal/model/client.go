@@ -10,10 +10,10 @@ import (
 
 // Request is a single model invocation.
 type Request struct {
-	SystemPrompt string    `json:"systemPrompt"`
-	Messages     []Message `json:"messages"`
+	SystemPrompt string     `json:"systemPrompt"`
+	Messages     []Message  `json:"messages"`
 	Tools        []ToolSpec `json:"tools,omitempty"`
-	Model        string    `json:"model,omitempty"`
+	Model        string     `json:"model,omitempty"`
 }
 
 // Message is one entry in the conversation history.
