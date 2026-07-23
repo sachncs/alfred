@@ -1,0 +1,31 @@
+{{define "timeline"}}
+{{if .ThreadID}}
+{{if .Messages}}
+<div style="display:flex;flex-direction:column;gap:var(--ds-space-md);padding:var(--ds-space-md)">
+  {{range .Messages}}
+  {{if eq .Kind "user_message"}}
+  <div class="ds-bubble-user">{{.Text}}</div>
+  {{else if eq .Kind "assistant_text"}}
+  <div class="ds-bubble-assistant">{{.Text}}</div>
+  {{else if eq .Kind "tool_call"}}
+  <div class="ds-tool-call">{{.ToolName}}({{.ToolInput}})</div>
+  {{else if eq .Kind "tool_result"}}
+  <div class="ds-tool-call" style="color:var(--ds-text-faint)">{{.Text}}</div>
+  {{else if eq .Kind "error"}}
+  <div class="ds-card-sm" style="border-color:var(--ds-danger)">{{.Text}}</div>
+  {{end}}
+  {{end}}
+</div>
+{{else}}
+<div class="ds-empty">
+  <div style="font-size:1.5rem;color:var(--ds-accent);font-weight:700">A</div>
+  <div>Start a conversation</div>
+</div>
+{{end}}
+{{else}}
+<div class="ds-empty">
+  <div style="font-size:2rem;color:var(--ds-accent);font-weight:700">A</div>
+  <div>Select a thread or create a new one</div>
+</div>
+{{end}}
+{{end}}

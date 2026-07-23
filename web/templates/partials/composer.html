@@ -1,0 +1,20 @@
+{{define "composer"}}
+{{if .ThreadID}}
+<form hx-post="/ui/threads/{{.ThreadID}}/turns"
+      hx-target="#timeline"
+      hx-swap="beforeend"
+      hx-on::after-request="this.reset()">
+  <div style="display:flex;gap:8px;align-items:flex-end">
+    <textarea name="text" class="ds-input ds-textarea"
+              placeholder="Type a message..."
+              rows="1"
+              hx-on::keydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();this.closest('form').requestSubmit()}"></textarea>
+    <button type="submit" class="ds-btn ds-btn-primary">Send</button>
+  </div>
+</form>
+{{else}}
+<div class="ds-empty" style="padding:var(--ds-space-sm)">
+  <span style="color:var(--ds-text-faint);font-size:var(--ds-font-size-sm)">Create a thread to start</span>
+</div>
+{{end}}
+{{end}}

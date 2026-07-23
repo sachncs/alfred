@@ -1,0 +1,160 @@
+/* Neumorphic primitive showcase styles
+   Reference: 00-ui-ux-design-reference.md N5, N6, N7 */
+
+/* === N5: Gauge Meter (SVG arc) === */
+.ds-gauge {
+  position: relative;
+  width: 160px;
+  height: 100px;
+  margin: 0 auto;
+}
+
+.ds-gauge-arc {
+  fill: none;
+  stroke: var(--ds-neuro-surface-sunken);
+  stroke-width: 12;
+  stroke-linecap: round;
+}
+
+.ds-gauge-fill {
+  fill: none;
+  stroke: var(--ds-accent);
+  stroke-width: 12;
+  stroke-linecap: round;
+  transition: stroke-dashoffset var(--ds-transition-base);
+}
+
+.ds-gauge-needle {
+  fill: var(--ds-accent);
+  filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.5));
+  transform-origin: 80px 80px;
+}
+
+.ds-gauge-label {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  text-align: center;
+  font-size: var(--ds-font-size-xl);
+  font-weight: 700;
+  color: var(--ds-text);
+}
+
+.ds-gauge-ticks {
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--ds-font-size-sm);
+  color: var(--ds-text-faint);
+  padding: 0 8px;
+  margin-top: 4px;
+}
+
+/* === N6: Trend Chart (SVG wave) === */
+.ds-trend-chart {
+  width: 100%;
+  height: 120px;
+}
+
+.ds-trend-line {
+  fill: none;
+  stroke: var(--ds-accent);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.ds-trend-area {
+  fill: url(#ds-trend-gradient);
+}
+
+/* === N7: Owner Card (stacked profile) === */
+.ds-owner-stack {
+  position: relative;
+  width: 200px;
+  height: 120px;
+}
+
+.ds-owner-card {
+  position: absolute;
+  width: 180px;
+  background: var(--ds-neuro-pill-active);
+  border: 1px solid var(--ds-neuro-border-strong);
+  border-radius: var(--ds-radius-card);
+  box-shadow: var(--ds-neuro-shadow-raised);
+  padding: var(--ds-space-md);
+  display: flex;
+  align-items: center;
+  gap: var(--ds-space-md);
+}
+
+.ds-owner-card:nth-child(1) { top: 0; left: 0; z-index: 3; opacity: 1; }
+.ds-owner-card:nth-child(2) { top: 8px; left: 10px; z-index: 2; opacity: 0.5; }
+.ds-owner-card:nth-child(3) { top: 16px; left: 20px; z-index: 1; opacity: 0.25; }
+
+.ds-owner-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 2px solid var(--ds-accent);
+  background: var(--ds-neuro-surface);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--ds-font-size-lg);
+  color: var(--ds-accent);
+  flex-shrink: 0;
+}
+
+.ds-owner-info {
+  overflow: hidden;
+}
+
+.ds-owner-name {
+  font-size: var(--ds-font-size-base);
+  font-weight: 600;
+  color: #ffffff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ds-owner-role {
+  font-size: var(--ds-font-size-sm);
+  color: var(--ds-text-faint);
+}
+
+/* === Showcase page === */
+.ds-showcase {
+  padding: var(--ds-space-xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-space-xl);
+  overflow-y: auto;
+  height: 100vh;
+}
+
+.ds-showcase-title {
+  font-size: var(--ds-font-size-xl);
+  font-weight: 700;
+  color: var(--ds-accent);
+}
+
+.ds-showcase-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-space-md);
+}
+
+.ds-showcase-label {
+  font-size: var(--ds-font-size-sm);
+  color: var(--ds-text-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.ds-showcase-row {
+  display: flex;
+  gap: var(--ds-space-lg);
+  align-items: flex-start;
+  flex-wrap: wrap;
+}

@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"net/http"
 	"sync"
+	"time"
 
 	"github.com/alfred/alfred/internal/contract"
 	"github.com/alfred/alfred/internal/model"
@@ -50,6 +51,28 @@ func NewAlfredRuntimeWithHybrid(bearerToken string, hybrid *store.HybridThreadSt
 
 // SetModelClient sets the model client used for turn execution.
 func (r *AlfredRuntime) SetModelClient(c model.Client) { r.client = c }
+
+// StartTurn creates a queued turn, persists it, and executes it async.
+// Returns the queued turn immediately; SSE streams the result when done.
+func (r *AlfredRuntime) StartTurn(thread *contract.Thread, input contract.UserInput) (*contract.Turn, error) {
+	turnID := contract.TurnID(fmt.Sprintf("turn-%d", time.Now().UnixNano()))
+	turn := &contract.Turn{
+		ID:        turnID,
+		ThreadID:  thread.ID,
+		Status:    contract.TurnStatusQueued,
+		StartedAt: time.Now().UTC(),
+		Items:     []contract.TurnItem{},
+	}
+
+	if sql := r.sqlStore(); sql != nil {
+		if err := sql.InsertTurn(turn); err != nil {
+			defaultTurnLog.Printf("web: insert turn row %s: %v", turnID, err)
+		}
+	}
+
+	go r.executeTurn(context.Background(), r, thread, turnID, input)
+	return turn, nil
+}
 
 func (r *AlfredRuntime) setupSSERoutes() {
 	r.mux.HandleFunc("GET /v1/threads/{id}/events", r.handleSSE)

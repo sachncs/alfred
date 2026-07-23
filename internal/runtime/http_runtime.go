@@ -83,7 +83,7 @@ func (r *HTTPRuntime) setupRoutes() {
 func (r *HTTPRuntime) handleHealth(w http.ResponseWriter, req *http.Request) {
 	resp := contract.HealthResponse{
 		Status:    "ok",
-		Version:   "0.3.0-phase3",
+		Version:   "0.4.0-phase4",
 		Timestamp: time.Now().UTC(),
 	}
 	w.Header().Set("Content-Type", "application/json")
@@ -110,6 +110,9 @@ func (r *HTTPRuntime) Start(ctx context.Context, port int) error {
 func (r *HTTPRuntime) Handler() http.Handler {
 	return BearerAuth(r.bearerToken, r.mux)
 }
+
+// Mux returns the underlying ServeMux for external route registration (e.g. web UI).
+func (r *HTTPRuntime) Mux() *http.ServeMux { return r.mux }
 
 // ThreadStore returns the thread store.
 func (r *HTTPRuntime) ThreadStore() ThreadStore { return r.threadStore }

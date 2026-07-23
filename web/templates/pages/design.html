@@ -1,0 +1,94 @@
+{{define "content"}}
+<div class="ds-showcase">
+  <div class="ds-showcase-title">Alfred Design Primitives</div>
+
+  <div class="ds-showcase-section">
+    <div class="ds-showcase-label">N5 — Gauge Meter</div>
+    <div class="ds-showcase-row">
+      {{template "neuro_gauge.html" .}}
+    </div>
+  </div>
+
+  <div class="ds-showcase-section">
+    <div class="ds-showcase-label">N6 — Trend Chart</div>
+    <div class="ds-showcase-row">
+      {{template "neuro_trend_chart.html" .}}
+    </div>
+  </div>
+
+  <div class="ds-showcase-section">
+    <div class="ds-showcase-label">N7 — Owner Card (stacked)</div>
+    <div class="ds-showcase-row">
+      {{template "neuro_owner_card.html" .}}
+    </div>
+  </div>
+
+  <div class="ds-showcase-section">
+    <div class="ds-showcase-label">Components</div>
+    <div class="ds-showcase-row">
+      <div class="ds-card">
+        <div style="color:var(--ds-accent);font-weight:600;margin-bottom:8px">Card (Raised)</div>
+        <div style="color:var(--ds-text-muted);font-size:var(--ds-font-size-sm)">Dual shadow surface</div>
+      </div>
+      <div class="ds-card-sm">
+        <div style="color:var(--ds-accent);font-weight:600;margin-bottom:4px">Card (Small)</div>
+        <div style="color:var(--ds-text-muted);font-size:var(--ds-font-size-sm)">Compact variant</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ds-showcase-section">
+    <div class="ds-showcase-label">Buttons</div>
+    <div class="ds-showcase-row">
+      <button class="ds-btn">Default</button>
+      <button class="ds-btn ds-btn-primary">Primary</button>
+      <button class="ds-btn ds-btn-sm">Small</button>
+    </div>
+  </div>
+
+  <div class="ds-showcase-section">
+    <div class="ds-showcase-label">Inputs</div>
+    <div class="ds-showcase-row" style="width:300px">
+      <input class="ds-input" placeholder="Text input...">
+    </div>
+  </div>
+
+  <div class="ds-showcase-section">
+    <div class="ds-showcase-label">Message Bubbles</div>
+    <div class="ds-showcase-row" style="flex-direction:column;width:400px">
+      <div class="ds-bubble-user">User message</div>
+      <div class="ds-bubble-assistant">Assistant response</div>
+    </div>
+  </div>
+
+  <div class="ds-showcase-section">
+    <div class="ds-showcase-label">Thinking State</div>
+    <div class="ds-showcase-row">
+      <div class="ds-thinking">
+        <span class="ds-thinking-dot"></span>
+        <span class="ds-thinking-dot"></span>
+        <span class="ds-thinking-dot"></span>
+        thinking...
+      </div>
+    </div>
+  </div>
+
+  <div class="ds-showcase-section">
+    <div class="ds-showcase-label">Tool Call</div>
+    <div class="ds-showcase-row" style="width:400px">
+      <div class="ds-tool-call">read_file(path="/src/main.go")</div>
+    </div>
+  </div>
+
+  <div class="ds-showcase-section">
+    <div class="ds-showcase-label">Todo Items</div>
+    <div class="ds-showcase-row" style="width:300px">
+      <div style="display:flex;flex-direction:column;gap:4px">
+        <div class="ds-todo-item"><div class="ds-todo-check ds-todo-check-done">✓</div><span style="text-decoration:line-through;color:var(--ds-text-faint)">Setup project</span></div>
+        <div class="ds-todo-item"><div class="ds-todo-check"></div><span>Implement auth</span></div>
+        <div class="ds-todo-item"><div class="ds-todo-check"></div><span>Write tests</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+{{end}}

@@ -21,9 +21,10 @@ import (
 	"github.com/alfred/alfred/internal/model"
 	"github.com/alfred/alfred/internal/runtime"
 	"github.com/alfred/alfred/internal/store"
+	"github.com/alfred/alfred/web"
 )
 
-const version = "0.3.0-phase3"
+const version = "0.4.0-phase4"
 
 func main() {
 	cfg := config.Defaults()
@@ -103,7 +104,17 @@ func main() {
 	rt.RegisterTool(editTool)
 	log.Printf("runtime ready")
 
-	// 8. Smoke-test the agent
+	// 8. Web UI (htmx shell)
+	webHandlers := web.NewHandlers()
+	webHandlers.Threads = rt.ThreadStore()
+	webHandlers.Thread = rt.ThreadStore()
+	webHandlers.Create = rt.ThreadStore()
+	webHandlers.Session = rt.SessionStore()
+	webHandlers.Starter = rt
+	web.Register(rt.Mux(), webHandlers, "web/static")
+	log.Printf("web ui ready: / and /design")
+
+	// 9. Smoke-test the agent
 	if err := smokeTest(chat); err != nil {
 		log.Printf("smoke test failed: %v", err)
 	} else {
@@ -113,7 +124,7 @@ func main() {
 	log.Printf("ready (Ctrl-C to exit)")
 	fmt.Println("READY")
 
-	// 9. Start HTTP server in background
+	// 10. Start HTTP server in background
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
@@ -123,7 +134,7 @@ func main() {
 		}
 	}()
 
-	// 10. Wait for SIGINT / SIGTERM
+	// 11. Wait for SIGINT / SIGTERM
 	sigCh := make(chan os.Signal, 1)
 	signal.Notify(sigCh, syscall.SIGINT, syscall.SIGTERM)
 	sig := <-sigCh
