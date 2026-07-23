@@ -1,0 +1,34 @@
+{{define "settings_general"}}
+<h3 style="font-size:16px;margin-bottom:16px;color:var(--fg-accent)">General</h3>
+<form hx-post="/v1/settings" hx-swap="none" style="max-width:480px">
+  <div style="margin-bottom:16px">
+    <label style="display:block;font-size:13px;margin-bottom:4px;color:var(--fg-secondary)">Theme</label>
+    <select name="theme" style="width:100%;padding:8px;border-radius:8px;background:var(--bg-secondary);color:var(--fg-primary);border:1px solid var(--border-subtle)">
+      <option value="dark">Dark</option>
+      <option value="light">Light</option>
+    </select>
+  </div>
+  <div style="margin-bottom:16px">
+    <label style="display:block;font-size:13px;margin-bottom:4px;color:var(--fg-secondary)">Language</label>
+    <select name="language" style="width:100%;padding:8px;border-radius:8px;background:var(--bg-secondary);color:var(--fg-primary);border:1px solid var(--border-subtle)">
+      <option value="en">English</option>
+      <option value="fr">French</option>
+      <option value="de">German</option>
+    </select>
+  </div>
+  <div style="margin-bottom:16px">
+    <label style="display:block;font-size:13px;margin-bottom:4px;color:var(--fg-secondary)">UI Scale</label>
+    <input type="range" name="uiScale" min="75" max="150" value="100" style="width:100%">
+  </div>
+  <div style="margin-bottom:16px">
+    <label style="display:block;font-size:13px;margin-bottom:4px;color:var(--fg-secondary)">Font Scale</label>
+    <input type="range" name="fontScale" min="75" max="150" value="100" style="width:100%">
+  </div>
+  <div style="margin-bottom:16px">
+    <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--fg-secondary)">
+      <input type="checkbox" name="autoStart" checked> Auto-start runtime on launch
+    </label>
+  </div>
+  <button type="submit" class="btn-primary" style="padding:8px 24px;border-radius:8px;background:var(--fg-accent);color:var(--bg-primary);border:none;cursor:pointer">Save</button>
+</form>
+{{end}}

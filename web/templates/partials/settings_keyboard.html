@@ -1,0 +1,18 @@
+{{define "settings_keyboard"}}
+<h3 style="font-size:16px;margin-bottom:16px;color:var(--fg-accent)">Keyboard Shortcuts</h3>
+<form hx-post="/v1/settings" hx-swap="none" style="max-width:480px">
+  <div style="margin-bottom:16px">
+    <label style="display:block;font-size:13px;margin-bottom:4px;color:var(--fg-secondary)">Submit</label>
+    <input type="text" name="shortcut_submit" value="Enter" style="width:100%;padding:8px;border-radius:8px;background:var(--bg-secondary);color:var(--fg-primary);border:1px solid var(--border-subtle)">
+  </div>
+  <div style="margin-bottom:16px">
+    <label style="display:block;font-size:13px;margin-bottom:4px;color:var(--fg-secondary)">New Thread</label>
+    <input type="text" name="shortcut_newThread" value="Cmd+N" style="width:100%;padding:8px;border-radius:8px;background:var(--bg-secondary);color:var(--fg-primary);border:1px solid var(--border-subtle)">
+  </div>
+  <div style="margin-bottom:16px">
+    <label style="display:block;font-size:13px;margin-bottom:4px;color:var(--fg-secondary)">Search</label>
+    <input type="text" name="shortcut_search" value="Cmd+K" style="width:100%;padding:8px;border-radius:8px;background:var(--bg-secondary);color:var(--fg-primary);border:1px solid var(--border-subtle)">
+  </div>
+  <button type="submit" class="btn-primary" style="padding:8px 24px;border-radius:8px;background:var(--fg-accent);color:var(--bg-primary);border:none;cursor:pointer">Save</button>
+</form>
+{{end}}

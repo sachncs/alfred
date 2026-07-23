@@ -1,0 +1,44 @@
+{{define "settings_agents"}}
+<h3 style="font-size:16px;margin-bottom:16px;color:var(--fg-accent)">Agent Runtime</h3>
+<form hx-post="/v1/settings" hx-swap="none" style="max-width:480px">
+  <div style="margin-bottom:16px">
+    <label style="display:block;font-size:13px;margin-bottom:4px;color:var(--fg-secondary)">Active Runtime</label>
+    <select name="activeRuntime" style="width:100%;padding:8px;border-radius:8px;background:var(--bg-secondary);color:var(--fg-primary);border:1px solid var(--border-subtle)">
+      <option value="alfred">Alfred (built-in)</option>
+      <option value="opencode">OpenCode (adapter)</option>
+    </select>
+  </div>
+  <h4 style="font-size:14px;margin:16px 0 8px;color:var(--fg-secondary)">OpenCode Settings</h4>
+  <div style="margin-bottom:16px">
+    <label style="display:block;font-size:13px;margin-bottom:4px;color:var(--fg-secondary)">Command</label>
+    <input type="text" name="opencode.command" value="opencode" style="width:100%;padding:8px;border-radius:8px;background:var(--bg-secondary);color:var(--fg-primary);border:1px solid var(--border-subtle)">
+  </div>
+  <div style="margin-bottom:16px">
+    <label style="display:block;font-size:13px;margin-bottom:4px;color:var(--fg-secondary)">Port</label>
+    <input type="number" name="opencode.port" value="8080" style="width:100%;padding:8px;border-radius:8px;background:var(--bg-secondary);color:var(--fg-primary);border:1px solid var(--border-subtle)">
+  </div>
+  <div style="margin-bottom:16px">
+    <label style="display:block;font-size:13px;margin-bottom:4px;color:var(--fg-secondary)">Model</label>
+    <input type="text" name="model" value="" placeholder="e.g. gpt-4o" style="width:100%;padding:8px;border-radius:8px;background:var(--bg-secondary);color:var(--fg-primary);border:1px solid var(--border-subtle)">
+  </div>
+  <div style="margin-bottom:16px">
+    <label style="display:block;font-size:13px;margin-bottom:4px;color:var(--fg-secondary)">Approval Policy</label>
+    <select name="approvalPolicy" style="width:100%;padding:8px;border-radius:8px;background:var(--bg-secondary);color:var(--fg-primary);border:1px solid var(--border-subtle)">
+      <option value="auto">Auto</option>
+      <option value="on-request" selected>On Request</option>
+      <option value="untrusted">Untrusted</option>
+      <option value="suggest">Suggest</option>
+      <option value="never">Never</option>
+    </select>
+  </div>
+  <div style="margin-bottom:16px">
+    <label style="display:block;font-size:13px;margin-bottom:4px;color:var(--fg-secondary)">Sandbox Mode</label>
+    <select name="sandboxMode" style="width:100%;padding:8px;border-radius:8px;background:var(--bg-secondary);color:var(--fg-primary);border:1px solid var(--border-subtle)">
+      <option value="read-only">Read Only</option>
+      <option value="workspace-write" selected>Workspace Write</option>
+      <option value="danger-full-access">Full Access</option>
+    </select>
+  </div>
+  <button type="submit" class="btn-primary" style="padding:8px 24px;border-radius:8px;background:var(--fg-accent);color:var(--bg-primary);border:none;cursor:pointer">Save</button>
+</form>
+{{end}}

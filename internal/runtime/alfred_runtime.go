@@ -11,6 +11,7 @@ import (
 
 	"github.com/alfred/alfred/internal/contract"
 	"github.com/alfred/alfred/internal/model"
+	"github.com/alfred/alfred/internal/settings"
 	"github.com/alfred/alfred/internal/store"
 )
 
@@ -24,11 +25,13 @@ type SSEEvent struct {
 // AlfredRuntime is a level-4 runtime that adds SSE streaming and replay buffers.
 type AlfredRuntime struct {
 	*LocalRuntime
-	client    model.Client
-	replayMu  sync.RWMutex
-	replayBuf map[contract.ThreadID][]SSEEvent
-	subsMu    sync.RWMutex
-	subs      map[contract.ThreadID][]chan SSEEvent
+	client     model.Client
+	settings   *settings.SettingsStore
+	settingsMu sync.RWMutex
+	replayMu   sync.RWMutex
+	replayBuf  map[contract.ThreadID][]SSEEvent
+	subsMu     sync.RWMutex
+	subs       map[contract.ThreadID][]chan SSEEvent
 }
 
 // NewAlfredRuntime creates an AlfredRuntime.
@@ -51,6 +54,24 @@ func NewAlfredRuntimeWithHybrid(bearerToken string, hybrid *store.HybridThreadSt
 
 // SetModelClient sets the model client used for turn execution.
 func (r *AlfredRuntime) SetModelClient(c model.Client) { r.client = c }
+
+// SetSettings attaches a settings store to the runtime.
+func (r *AlfredRuntime) SetSettings(s *settings.SettingsStore) {
+	r.settingsMu.Lock()
+	r.settings = s
+	r.settingsMu.Unlock()
+}
+
+// LoadSettings returns the current persisted settings.
+func (r *AlfredRuntime) LoadSettings() (contract.AppSettingsV1, error) {
+	r.settingsMu.RLock()
+	s := r.settings
+	r.settingsMu.RUnlock()
+	if s == nil {
+		return settings.DefaultAppSettings(), nil
+	}
+	return s.Load()
+}
 
 // StartTurn creates a queued turn, persists it, and executes it async.
 // Returns the queued turn immediately; SSE streams the result when done.

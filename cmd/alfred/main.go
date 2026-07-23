@@ -25,11 +25,12 @@ import (
 	writeassist "github.com/alfred/alfred/internal/mcp/worker/write_assist"
 	"github.com/alfred/alfred/internal/model"
 	"github.com/alfred/alfred/internal/runtime"
+	"github.com/alfred/alfred/internal/settings"
 	"github.com/alfred/alfred/internal/store"
 	"github.com/alfred/alfred/web"
 )
 
-const version = "0.5.0-phase5"
+const version = "0.6.0-phase6"
 
 func main() {
 	cfg := config.Defaults()
@@ -103,6 +104,15 @@ func main() {
 	sqlitePath, jsonlDir := hybrid.Addr()
 	log.Printf("hybrid store ready: sqlite=%s jsonl=%s", sqlitePath, jsonlDir)
 
+	// 3b. Settings store.
+	settingsStore := settings.NewSettingsStore(
+		hybrid.SQLite().GetSetting,
+		hybrid.SQLite().SetSetting,
+		hybrid.SQLite().DeleteSetting,
+	)
+	appSettings, _ := settingsStore.Load()
+	log.Printf("settings loaded: theme=%s model=%s", appSettings.AppBehavior.Theme, appSettings.LocalRuntime.Model)
+
 	// 4. Migration: legacy JSONL + ~/.kun.
 	if err := store.MigrateFromJSONL(hybrid, cfg.WorkspaceRoot); err != nil {
 		log.Printf("jsonl migration warning: %v", err)
@@ -133,6 +143,7 @@ func main() {
 	// 7. Runtime backed by hybrid store
 	rt := runtime.NewAlfredRuntimeWithHybrid(cfg.BearerToken, hybrid)
 	rt.SetModelClient(stubClient)
+	rt.SetSettings(settingsStore)
 	rt.RegisterTool(readTool)
 	rt.RegisterTool(writeTool)
 	rt.RegisterTool(editTool)
@@ -151,6 +162,9 @@ func main() {
 	// 8b. Capability IPC routes.
 	capability.RegisterCapabilityRoutes(rt.Mux(), broker, discovery)
 	log.Printf("capability routes ready: GET /v1/capabilities")
+
+	// 8c. Settings HTTP routes.
+	web.RegisterSettingsRoutes(rt.Mux(), settingsStore, settingsStore, settingsStore)
 
 	// 9. Smoke-test the agent
 	if err := smokeTest(chat); err != nil {

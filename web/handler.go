@@ -43,14 +43,15 @@ type TurnStarter interface {
 
 // Handlers holds parsed templates and store references.
 type Handlers struct {
-	chat    *template.Template
-	design  *template.Template
-	parts   *template.Template
-	Threads ThreadLister
-	Thread  ThreadGetter
-	Create  ThreadCreator
-	Session SessionReader
-	Starter TurnStarter
+	chat     *template.Template
+	design   *template.Template
+	settings *template.Template
+	parts    *template.Template
+	Threads  ThreadLister
+	Thread   ThreadGetter
+	Create   ThreadCreator
+	Session  SessionReader
+	Starter  TurnStarter
 }
 
 var funcMap = template.FuncMap{
@@ -97,13 +98,22 @@ func NewHandlers() *Handlers {
 		log.Printf("web: parse partials: %v", err)
 	}
 
-	return &Handlers{chat: chat, design: design, parts: parts}
+	settings, err := template.New("").Funcs(funcMap).ParseFS(templateFS,
+		"templates/layout.html",
+		"templates/pages/settings.html",
+	)
+	if err != nil {
+		log.Printf("web: parse settings templates: %v", err)
+	}
+
+	return &Handlers{chat: chat, design: design, settings: settings, parts: parts}
 }
 
 // Register mounts all web routes on mux. staticDir serves CSS/JS/images.
 func Register(mux *http.ServeMux, h *Handlers, staticDir string) {
 	mux.HandleFunc("GET /", h.handleChat)
 	mux.HandleFunc("GET /design", h.handleDesign)
+	mux.HandleFunc("GET /settings", h.handleSettings)
 	mux.HandleFunc("GET /ui/sidebar", h.handleSidebar)
 	mux.HandleFunc("GET /ui/threads/{id}/timeline", h.handleTimeline)
 	mux.HandleFunc("GET /ui/threads/{id}/todos", h.handleTodos)
