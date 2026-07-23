@@ -83,7 +83,7 @@ func (r *HTTPRuntime) setupRoutes() {
 func (r *HTTPRuntime) handleHealth(w http.ResponseWriter, req *http.Request) {
 	resp := contract.HealthResponse{
 		Status:    "ok",
-		Version:   "0.4.0-phase4",
+		Version:   "0.5.0-phase5",
 		Timestamp: time.Now().UTC(),
 	}
 	w.Header().Set("Content-Type", "application/json")

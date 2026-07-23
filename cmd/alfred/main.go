@@ -18,13 +18,18 @@ import (
 	"github.com/alfred/alfred/internal/contract"
 	"github.com/alfred/alfred/internal/fs"
 	"github.com/alfred/alfred/internal/mcp/worker"
+	modelrouter "github.com/alfred/alfred/internal/mcp/worker/model_router"
+	plangateway "github.com/alfred/alfred/internal/mcp/worker/plan_gateway"
+	runtimeinspector "github.com/alfred/alfred/internal/mcp/worker/runtime_inspector"
+	searchworker "github.com/alfred/alfred/internal/mcp/worker/search"
+	writeassist "github.com/alfred/alfred/internal/mcp/worker/write_assist"
 	"github.com/alfred/alfred/internal/model"
 	"github.com/alfred/alfred/internal/runtime"
 	"github.com/alfred/alfred/internal/store"
 	"github.com/alfred/alfred/web"
 )
 
-const version = "0.4.0-phase4"
+const version = "0.5.0-phase5"
 
 func main() {
 	cfg := config.Defaults()
@@ -58,6 +63,35 @@ func main() {
 			return b, nil
 		},
 	))
+
+	// 2b. Register 5 critical MCP workers with the broker.
+	workers := map[string]*worker.WorkerServer{
+		"mcp.search":       searchworker.NewSearchWorker(),
+		"mcp.model_router": modelrouter.NewModelRouterWorker(),
+		"mcp.plan_gateway": plangateway.NewPlanGatewayWorker(),
+		"mcp.write_assist": writeassist.NewWriteAssistWorker(),
+		"mcp.inspector":    runtimeinspector.NewInspectorWorker(),
+	}
+	for name, ws := range workers {
+		ws := ws
+		log.Printf("mcp worker ready: id=%s tools=%d", ws.ID(), len(ws.Tools()))
+		broker.Register(capability.NewFunction(
+			capability.ID(name),
+			func(_ context.Context, _ json.RawMessage) (json.RawMessage, error) {
+				out := map[string]any{
+					"id":    ws.ID(),
+					"tools": len(ws.Tools()),
+				}
+				b, _ := json.Marshal(out)
+				return b, nil
+			},
+		))
+	}
+
+	// 2c. Discovery + Observer for capability lifecycle.
+	discovery := capability.NewDiscovery(broker)
+	observer := capability.NewObserver()
+	_ = observer
 
 	// 3. Hybrid (SQLite + JSONL) thread store.
 	eventsDir := filepath.Join(filepath.Dir(cfg.DBPath), "events")
@@ -113,6 +147,10 @@ func main() {
 	webHandlers.Starter = rt
 	web.Register(rt.Mux(), webHandlers, "web/static")
 	log.Printf("web ui ready: / and /design")
+
+	// 8b. Capability IPC routes.
+	capability.RegisterCapabilityRoutes(rt.Mux(), broker, discovery)
+	log.Printf("capability routes ready: GET /v1/capabilities")
 
 	// 9. Smoke-test the agent
 	if err := smokeTest(chat); err != nil {
