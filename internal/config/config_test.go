@@ -75,3 +75,25 @@ func TestApplyEnvEmptyVarsNoop(t *testing.T) {
 		t.Errorf("workspace root changed without env var: %q", cfg.WorkspaceRoot)
 	}
 }
+
+func TestApplyEnvDBPath(t *testing.T) {
+	cfg := Defaults()
+	_ = os.Setenv("ALFRED_DB_PATH", "/tmp/test.db")
+	defer func() { _ = os.Unsetenv("ALFRED_DB_PATH") }()
+
+	cfg.ApplyEnv()
+	if cfg.DBPath != "/tmp/test.db" {
+		t.Errorf("db path after env = %q, want /tmp/test.db", cfg.DBPath)
+	}
+}
+
+func TestRegisterFlags(t *testing.T) {
+	cfg := Defaults()
+	showVersion := RegisterFlags(&cfg)
+	if showVersion == nil {
+		t.Fatal("RegisterFlags returned nil version pointer")
+	}
+	if *showVersion {
+		t.Fatal("version flag should default to false")
+	}
+}

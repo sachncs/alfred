@@ -29,7 +29,7 @@ type StartTurnResponse struct {
 	Turn Turn `json:"turn"`
 }
 
-// HealthResponse is the wire schema for GET /healthz.
+// HealthResponse is the wire schema for GET /v1/health.
 type HealthResponse struct {
 	Status    string    `json:"status"`
 	Version   string    `json:"version,omitempty"`

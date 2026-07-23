@@ -117,3 +117,75 @@ func TestJSONSerialization(t *testing.T) {
 		t.Fatalf("metadata not serialized: %s", s)
 	}
 }
+
+func TestSuccessWith(t *testing.T) {
+	r := tool.SuccessWith("result", map[string]any{"count": 42})
+	if !r.OK {
+		t.Fatal("expected OK")
+	}
+	if r.Content != "result" {
+		t.Fatalf("content = %q, want result", r.Content)
+	}
+	if !strings.Contains(string(r.Structured), `"count":42`) {
+		t.Fatalf("structured missing: %s", r.Structured)
+	}
+}
+
+func TestSuccessWithNilStructured(t *testing.T) {
+	r := tool.SuccessWith("ok", nil)
+	if !r.OK {
+		t.Fatal("expected OK")
+	}
+	if r.Structured != nil {
+		t.Fatalf("structured should be nil for nil input")
+	}
+}
+
+func TestFailureMsg(t *testing.T) {
+	r := tool.FailureMsg("something went wrong")
+	if r.OK {
+		t.Fatal("expected failure")
+	}
+	if r.Error != "something went wrong" {
+		t.Fatalf("error = %q", r.Error)
+	}
+}
+
+func TestFailureNilError(t *testing.T) {
+	r := tool.Failure(nil)
+	if r.OK {
+		t.Fatal("expected failure")
+	}
+	if r.Error != "" {
+		t.Fatalf("error should be empty for nil input: %q", r.Error)
+	}
+}
+
+type stubApprover struct {
+	approved bool
+}
+
+func (s *stubApprover) RequestApproval(ctx context.Context, reason string) (bool, error) {
+	return s.approved, nil
+}
+
+func TestWithApprover(t *testing.T) {
+	c := tool.NewContext(context.Background(), "thr", "turn", "call", "/tmp")
+	approver := &stubApprover{approved: true}
+	c2 := c.WithApprover(approver)
+	if c2.Approver == nil {
+		t.Fatal("approver not set")
+	}
+	if c2.ThreadID != "thr" {
+		t.Fatalf("thread id lost: %s", c2.ThreadID)
+	}
+	if c2.TurnID != "turn" {
+		t.Fatalf("turn id lost: %s", c2.TurnID)
+	}
+	if c2.ToolCallID != "call" {
+		t.Fatalf("tool call id lost: %s", c2.ToolCallID)
+	}
+	if c2.WorkspaceRoot != "/tmp" {
+		t.Fatalf("workspace root lost: %s", c2.WorkspaceRoot)
+	}
+}

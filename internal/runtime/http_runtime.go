@@ -76,10 +76,10 @@ func (r *HTTPRuntime) ApprovalStore() *ApprovalStore { return r.approvals }
 func (r *HTTPRuntime) AttachmentStore() *AttachmentStore { return r.attachments }
 
 func (r *HTTPRuntime) setupRoutes() {
-	r.mux.HandleFunc("GET /health", r.handleHealth)
-	r.mux.HandleFunc("GET /healthz", r.handleHealth)
+	r.mux.HandleFunc("GET /v1/health", r.handleHealth)
 }
 
+// handleHealth serves GET /v1/health with a JSON health response.
 func (r *HTTPRuntime) handleHealth(w http.ResponseWriter, req *http.Request) {
 	resp := contract.HealthResponse{
 		Status:    "ok",

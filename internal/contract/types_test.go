@@ -67,3 +67,40 @@ func TestHealthResponse(t *testing.T) {
 		t.Fatalf("status missing: %s", b)
 	}
 }
+
+func TestErrorf(t *testing.T) {
+	e := contract.Errorf(contract.CodeNotFound, "thread not found")
+	b, _ := json.Marshal(e)
+	s := string(b)
+	if !strings.Contains(s, `"code":"not_found"`) {
+		t.Fatalf("code missing: %s", s)
+	}
+	if !strings.Contains(s, `"message":"thread not found"`) {
+		t.Fatalf("message missing: %s", s)
+	}
+	if strings.Contains(s, `"details"`) {
+		t.Fatalf("details should be omitted for Errorf: %s", s)
+	}
+}
+
+func TestErrorCodes(t *testing.T) {
+	codes := []string{
+		contract.CodeUnauthorized,
+		contract.CodeForbidden,
+		contract.CodeNotFound,
+		contract.CodeValidation,
+		contract.CodeTurnInProgress,
+		contract.CodeUnavailable,
+		contract.CodeInternal,
+	}
+	seen := make(map[string]bool)
+	for _, c := range codes {
+		if c == "" {
+			t.Fatal("empty error code")
+		}
+		if seen[c] {
+			t.Fatalf("duplicate error code: %s", c)
+		}
+		seen[c] = true
+	}
+}

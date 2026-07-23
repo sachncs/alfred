@@ -2,7 +2,7 @@
 
 A research workbench: a local agent runtime with structured tool calling, persistent threads, and a fleet of MCP workers (search, plotting, evidence DAG, image generation, and more).
 
-Phase 1 ships the foundation: the OOP hierarchy (Tool, Agent, MCPServer, Capability), one hello-world concrete implementation of each, and a `cmd/alfred` binary that boots, runs, and shuts down cleanly.
+Phases 1-3 are complete: the OOP hierarchy, HTTP/SSE runtime with full turn loop, all built-in tools, and SQLite+JSONL persistence.
 
 ## Architecture
 
@@ -37,17 +37,24 @@ alfred/
 ├── Makefile                     # build / test / vet / lint / run / clean
 ├── .golangci.yml                # golangci-lint v2 config
 ├── README.md
-├── cmd/alfred/main.go           # hello-world orchestrator
+├── CHANGELOG.md
+├── cmd/alfred/main.go           # orchestrator with SIGINT handling
 ├── internal/
 │   ├── contract/                # shared wire types (Thread, Turn, Item, Error)
 │   │   └── testutil/            # fake builders for tests
 │   ├── tool/                    # Tool interface, Context, Result
-│   ├── fs/                      # FileSystemTool abstract, ReadTool concrete
+│   ├── fs/                      # FileSystemTool + Read/Write/Edit/ApplyPatch/Ls
+│   ├── exec/                    # BashTool (shell execution with timeout)
+│   ├── search/                  # GrepTool, FindTool
 │   ├── agent/                   # Agent interface, AgentState, ChatAgent
 │   ├── model/                   # model.Client interface, StubClient
 │   ├── mcp/                     # MCPServer, StdioTransport
 │   │   └── worker/              # WorkerServer abstract, EchoServer concrete
-│   └── capability/              # Capability interface, Broker, Function
+│   ├── capability/              # Capability interface, Broker, Function
+│   ├── runtime/                 # HTTPRuntime, LocalRuntime, AlfredRuntime, turn loop
+│   ├── store/                   # SQLite + JSONL persistence, hybrid thread store
+│   ├── config/                  # CLI flags + env var configuration
+│   └── log/                     # Structured logging with secret redaction
 └── bin/alfred                   # built binary (gitignored)
 ```
 
@@ -63,17 +70,14 @@ make run      # build + run
 make clean    # remove ./bin/
 ```
 
-## Phase 1 acceptance (verified)
+## Phase 3 acceptance (verified)
 
 ```bash
 $ make build
 Built bin/alfred
 
-$ ./bin/alfred --version
-alfred 0.1.0-phase1
-
 $ make test
-... 9 packages, all OK under -race
+... 15 packages, all OK under -race
 
 $ make vet
 go vet clean
@@ -81,29 +85,49 @@ go vet clean
 $ make lint
 0 issues.
 
-$ ./bin/alfred
-2026/07/22 11:20:11 alfred 0.1.0-phase1 starting on port 8899 (placeholder)
-2026/07/22 11:20:11 mcp worker ready: id=echo-worker tools=1
-2026/07/22 11:20:11 chat agent ready: id=alfred.chat tools=1
-2026/07/22 11:20:11 smoke test passed: agent produced a turn end-to-end
-2026/07/22 11:20:11 ready (Ctrl-C to exit)
+$ ./bin/alfred --port 8899
+2026/07/23 alfred 0.3.0-phase3 starting on port 8899 (db=~/.alfred/alfred.db)
+2026/07/23 mcp worker ready: id=echo-worker tools=1
+2026/07/23 hybrid store ready: sqlite=~/.alfred/alfred.db jsonl=~/.alfred/events
+2026/07/23 chat agent ready: id=alfred.chat tools=3
+2026/07/23 runtime ready
+2026/07/23 ready (Ctrl-C to exit)
 READY
-^C
-2026/07/22 11:20:13 received signal interrupt; shutting down
-$ echo $?
-0
 ```
 
-## What's NOT in Phase 1
+### Health check
 
-Phase 1 is the foundation only. Phase 2+ layers on:
+```bash
+$ curl http://127.0.0.1:8899/v1/health
+{"status":"ok","version":"0.3.0-phase3","timestamp":"2026-07-23T..."}
+```
 
-- HTTP/SSE runtime (currently just a blocking binary with SIGINT handling)
-- SQLite + JSONL persistence (currently in-memory)
-- Web UI (htmx + Go html/template)
-- All 28 MCP workers (currently only EchoServer)
-- All 7 neumorphic UI primitives (only available in the SciForge codebase)
-- DuckDuckGo search, model-router, plan-gateway, write-assist, runtime-inspector
-- Remote channel runtime, settings persistence, anchored comments, write mode, SDD
+### Create a thread
+
+```bash
+$ curl -X POST http://127.0.0.1:8899/v1/threads -d '{"title":"research"}'
+{"thread":{"id":"...","title":"research","status":"idle",...}}
+```
+
+## What's complete (Phases 1-3)
+
+- **Phase 1**: OOP hierarchy (Tool, Agent, MCPServer, Capability), ChatAgent, EchoServer, binary boot
+- **Phase 2**: HTTP/SSE runtime, turn loop with tool dispatch, compaction, token economy, history hygiene, steering queue, sub-agent delegation, usage tracking, tool budgets, prompt cache, memory store, skills loader, built-in tools (Read/Write/Edit/ApplyPatch/Bash/Grep/Find/Ls), code review, fork/resume, goals/todos, all HTTP routes
+- **Phase 3**: SQLite persistence (pure Go via modernc.org/sqlite), schema migrations, hybrid thread store (SQLite index + JSONL body), retention pruning, JSONL migration, legacy Kun config migration
+
+## What's NOT done yet
+
+Phase 4+ layers on:
+
+- Web UI (htmx + Go html/template) — Phase 4
+- All 28 MCP workers (search, model-router, plan-gateway, write-assist, etc.) — Phases 5/7
+- Capability broker and resource/file capabilities — Phase 5
+- Settings persistence (AppSettingsV1) — Phase 6
+- Research workers, paper radar, multi-agent — Phase 7a
+- Image generation, scientific plotting, visual documents — Phase 7b
+- Workspace previews — Phase 7c
+- Workflow engine, schedule tasks, remote executor — Phase 7d
+- UX features (plan mode, write mode, anchored comments) — Phase 8
+- Remote channel runtime, cutover from SciForge — Phase 9
 
 See `todo/` for the full plan.

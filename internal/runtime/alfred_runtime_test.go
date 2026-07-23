@@ -22,7 +22,7 @@ func newTestAlfredRuntime(t *testing.T) *AlfredRuntime {
 
 func TestAlfredRuntimeHealth(t *testing.T) {
 	rt := newTestAlfredRuntime(t)
-	req := httptest.NewRequest("GET", "/health", nil)
+	req := httptest.NewRequest("GET", "/v1/health", nil)
 	w := httptest.NewRecorder()
 	rt.Handler().ServeHTTP(w, req)
 	if w.Code != 200 {

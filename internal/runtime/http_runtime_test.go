@@ -16,7 +16,7 @@ func TestHTTPRuntimeHealth(t *testing.T) {
 	ss, _ := store.NewFileSessionStore(t.TempDir())
 	rt := NewHTTPRuntime("", ts, ss)
 
-	req := httptest.NewRequest("GET", "/health", nil)
+	req := httptest.NewRequest("GET", "/v1/health", nil)
 	w := httptest.NewRecorder()
 	rt.Handler().ServeHTTP(w, req)
 
@@ -30,7 +30,7 @@ func TestHTTPRuntimeHealth(t *testing.T) {
 	}
 }
 
-func TestHTTPRuntimeHealthz(t *testing.T) {
+func TestHTTPRuntimeHealthzRemoved(t *testing.T) {
 	ts, _ := store.NewFileThreadStore(t.TempDir())
 	ss, _ := store.NewFileSessionStore(t.TempDir())
 	rt := NewHTTPRuntime("", ts, ss)
@@ -39,8 +39,22 @@ func TestHTTPRuntimeHealthz(t *testing.T) {
 	w := httptest.NewRecorder()
 	rt.Handler().ServeHTTP(w, req)
 
-	if w.Code != 200 {
-		t.Errorf("status = %d, want 200", w.Code)
+	if w.Code != 404 {
+		t.Errorf("status = %d, want 404 for removed /healthz route", w.Code)
+	}
+}
+
+func TestHTTPRuntimeLegacyHealthRemoved(t *testing.T) {
+	ts, _ := store.NewFileThreadStore(t.TempDir())
+	ss, _ := store.NewFileSessionStore(t.TempDir())
+	rt := NewHTTPRuntime("", ts, ss)
+
+	req := httptest.NewRequest("GET", "/health", nil)
+	w := httptest.NewRecorder()
+	rt.Handler().ServeHTTP(w, req)
+
+	if w.Code != 404 {
+		t.Errorf("status = %d, want 404 for removed /health route", w.Code)
 	}
 }
 
@@ -49,7 +63,7 @@ func TestBearerAuthValid(t *testing.T) {
 	ss, _ := store.NewFileSessionStore(t.TempDir())
 	rt := NewHTTPRuntime("secret-token", ts, ss)
 
-	req := httptest.NewRequest("GET", "/health", nil)
+	req := httptest.NewRequest("GET", "/v1/health", nil)
 	req.Header.Set("Authorization", "Bearer secret-token")
 	w := httptest.NewRecorder()
 	rt.Handler().ServeHTTP(w, req)
@@ -64,7 +78,7 @@ func TestBearerAuthInvalid(t *testing.T) {
 	ss, _ := store.NewFileSessionStore(t.TempDir())
 	rt := NewHTTPRuntime("secret-token", ts, ss)
 
-	req := httptest.NewRequest("GET", "/health", nil)
+	req := httptest.NewRequest("GET", "/v1/health", nil)
 	req.Header.Set("Authorization", "Bearer wrong-token")
 	w := httptest.NewRecorder()
 	rt.Handler().ServeHTTP(w, req)
@@ -79,7 +93,7 @@ func TestBearerAuthMissing(t *testing.T) {
 	ss, _ := store.NewFileSessionStore(t.TempDir())
 	rt := NewHTTPRuntime("secret-token", ts, ss)
 
-	req := httptest.NewRequest("GET", "/health", nil)
+	req := httptest.NewRequest("GET", "/v1/health", nil)
 	w := httptest.NewRecorder()
 	rt.Handler().ServeHTTP(w, req)
 
@@ -93,7 +107,7 @@ func TestBearerAuthDisabledWhenEmpty(t *testing.T) {
 	ss, _ := store.NewFileSessionStore(t.TempDir())
 	rt := NewHTTPRuntime("", ts, ss)
 
-	req := httptest.NewRequest("GET", "/health", nil)
+	req := httptest.NewRequest("GET", "/v1/health", nil)
 	w := httptest.NewRecorder()
 	rt.Handler().ServeHTTP(w, req)
 
@@ -139,7 +153,7 @@ func TestBearerAuthMalformedHeader(t *testing.T) {
 	ss, _ := store.NewFileSessionStore(t.TempDir())
 	rt := NewHTTPRuntime("token", ts, ss)
 
-	req := httptest.NewRequest("GET", "/health", nil)
+	req := httptest.NewRequest("GET", "/v1/health", nil)
 	req.Header.Set("Authorization", "Basic dXNlcjpwYXNz")
 	w := httptest.NewRecorder()
 	rt.Handler().ServeHTTP(w, req)

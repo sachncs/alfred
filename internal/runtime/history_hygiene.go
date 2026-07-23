@@ -2,6 +2,7 @@ package runtime
 
 import (
 	"regexp"
+	"strconv"
 	"strings"
 )
 
@@ -38,7 +39,7 @@ func (h *HistoryHygiene) CleanText(text string) string {
 	return text
 }
 
-// HygieneMarker returns a marker string for compacted turns.
+// HygieneMarker returns a marker string recording how many turns were cleaned.
 func HygieneMarker(turnsCompacted int) string {
-	return "[history-hygiene: " + itoa(turnsCompacted) + " turns cleaned]"
+	return "[history-hygiene: " + strconv.Itoa(turnsCompacted) + " turns cleaned]"
 }

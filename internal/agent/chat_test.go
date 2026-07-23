@@ -229,6 +229,15 @@ func TestChatAgentConcurrentRegistrations(t *testing.T) {
 	<-done
 }
 
+func TestChatAgentID(t *testing.T) {
+	t.Parallel()
+	client := model.ScriptedChatClient("x")
+	a := agent.NewChatAgent("my-agent", "prompt", client)
+	if a.ID() != "my-agent" {
+		t.Fatalf("ID = %q, want my-agent", a.ID())
+	}
+}
+
 func TestStubClientClosedChannel(t *testing.T) {
 	t.Parallel()
 	client := model.ScriptedChatClient("hi")

@@ -1,6 +1,8 @@
 package runtime
 
 import (
+	"strconv"
+
 	"github.com/alfred/alfred/internal/contract"
 )
 
@@ -19,7 +21,7 @@ type Compactor struct {
 	summaryAfter int
 }
 
-// NewCompactor creates a Compactor.
+// NewCompactor creates a Compactor with the given turn budget and summary threshold.
 func NewCompactor(maxTurns, summaryAfter int) *Compactor {
 	if maxTurns <= 0 {
 		maxTurns = 40
@@ -110,7 +112,7 @@ func makeSummaryTurn(compacted []contract.Turn) contract.Turn {
 		text += string(rune('0'+len(compacted))) + " older turns summarized]"
 	}
 	if len(compacted) > 9 {
-		text = "[compacted: " + itoa(len(compacted)) + " older turns summarized]"
+		text = "[compacted: " + strconv.Itoa(len(compacted)) + " older turns summarized]"
 	}
 	return contract.Turn{
 		ID:     contract.TurnID("compact-summary"),
@@ -120,20 +122,4 @@ func makeSummaryTurn(compacted []contract.Turn) contract.Turn {
 			Text: &text,
 		}},
 	}
-}
-
-// itoa is a minimal int-to-string for small positive numbers.
-// ponytail: strconv.Itoa would work, this avoids the import for 3 lines.
-func itoa(n int) string {
-	if n == 0 {
-		return "0"
-	}
-	var buf [16]byte
-	i := len(buf)
-	for n > 0 {
-		i--
-		buf[i] = byte('0' + n%10)
-		n /= 10
-	}
-	return string(buf[i:])
 }

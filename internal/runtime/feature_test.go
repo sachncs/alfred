@@ -1,6 +1,7 @@
 package runtime
 
 import (
+	"strconv"
 	"testing"
 
 	"github.com/alfred/alfred/internal/contract"
@@ -277,7 +278,7 @@ func TestSummaryCount(t *testing.T) {
 	}
 }
 
-func TestItoa(t *testing.T) {
+func TestStrconvItoa(t *testing.T) {
 	tests := []struct {
 		in   int
 		want string
@@ -285,8 +286,8 @@ func TestItoa(t *testing.T) {
 		{0, "0"}, {1, "1"}, {42, "42"}, {123, "123"},
 	}
 	for _, tt := range tests {
-		if got := itoa(tt.in); got != tt.want {
-			t.Errorf("itoa(%d) = %q, want %q", tt.in, got, tt.want)
+		if got := strconv.Itoa(tt.in); got != tt.want {
+			t.Errorf("strconv.Itoa(%d) = %q, want %q", tt.in, got, tt.want)
 		}
 	}
 }
