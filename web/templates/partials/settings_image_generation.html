@@ -1,0 +1,18 @@
+{{define "settings_image_generation"}}
+<h3 style="font-size:16px;margin-bottom:16px;color:var(--fg-accent)">Image Generation</h3>
+<form hx-post="/v1/settings" hx-swap="none" style="max-width:480px">
+  <div style="margin-bottom:16px">
+    <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--fg-secondary)">
+      <input type="checkbox" name="imageGeneration.enabled"> Enable image generation
+    </label>
+  </div>
+  <div style="margin-bottom:16px">
+    <label style="display:block;font-size:13px;margin-bottom:4px;color:var(--fg-secondary)">Provider</label>
+    <select name="imageGeneration.provider" style="width:100%;padding:8px;border-radius:8px;background:var(--bg-secondary);color:var(--fg-primary);border:1px solid var(--border-subtle)">
+      <option value="dalle">DALL-E</option>
+      <option value="stable-diffusion">Stable Diffusion</option>
+    </select>
+  </div>
+  <button type="submit" class="btn-primary" style="padding:8px 24px;border-radius:8px;background:var(--fg-accent);color:var(--bg-primary);border:none;cursor:pointer">Save</button>
+</form>
+{{end}}

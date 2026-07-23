@@ -1,0 +1,12 @@
+{{define "paper_radar_panel"}}
+<div class="neumorphic-card" style="padding:16px;margin:8px 0">
+  <h3 style="font-size:14px;color:var(--fg-accent);margin-bottom:12px">Paper Radar</h3>
+  <div style="display:flex;gap:8px;margin-bottom:12px">
+    <input type="text" id="paper-radar-query" placeholder="Search papers..." style="flex:1;padding:6px 10px;border-radius:6px;background:var(--bg-secondary);color:var(--fg-primary);border:1px solid var(--border-subtle);font-size:13px">
+    <button hx-post="/v1/capabilities/paper-radar/dispatch" hx-vals='{"tool":"paper_search"}' hx-swap="none" class="btn-primary" style="padding:6px 12px;border-radius:6px;font-size:12px;background:var(--fg-accent);color:var(--bg-primary)">Search</button>
+  </div>
+  <div id="paper-radar-results" style="min-height:100px;border:1px solid var(--border-subtle);border-radius:8px;padding:12px">
+    <p style="color:var(--fg-secondary);font-size:13px">Enter a query to search papers.</p>
+  </div>
+</div>
+{{end}}

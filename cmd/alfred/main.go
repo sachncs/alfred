@@ -18,10 +18,33 @@ import (
 	"github.com/alfred/alfred/internal/contract"
 	"github.com/alfred/alfred/internal/fs"
 	"github.com/alfred/alfred/internal/mcp/worker"
+	bgcdiscovery "github.com/alfred/alfred/internal/mcp/worker/bgc_discovery"
+	evidencedag "github.com/alfred/alfred/internal/mcp/worker/evidence_dag"
+	feedbackgateway "github.com/alfred/alfred/internal/mcp/worker/feedback_gateway"
+	guiowl "github.com/alfred/alfred/internal/mcp/worker/gui_owl/cua"
+	imagegeneration "github.com/alfred/alfred/internal/mcp/worker/image_generation"
 	modelrouter "github.com/alfred/alfred/internal/mcp/worker/model_router"
+	multiagent "github.com/alfred/alfred/internal/mcp/worker/multi_agent"
+	paperradar "github.com/alfred/alfred/internal/mcp/worker/paper_radar"
 	plangateway "github.com/alfred/alfred/internal/mcp/worker/plan_gateway"
+	pptmaster "github.com/alfred/alfred/internal/mcp/worker/ppt_master"
+	projectdag "github.com/alfred/alfred/internal/mcp/worker/project_dag"
+	remoteexecutor "github.com/alfred/alfred/internal/mcp/worker/remote_executor"
 	runtimeinspector "github.com/alfred/alfred/internal/mcp/worker/runtime_inspector"
+	scheduleservice "github.com/alfred/alfred/internal/mcp/worker/schedule"
+	scimodality "github.com/alfred/alfred/internal/mcp/worker/sci_modality"
+	scientificplotting "github.com/alfred/alfred/internal/mcp/worker/scientific_plotting"
 	searchworker "github.com/alfred/alfred/internal/mcp/worker/search"
+	visualdocument "github.com/alfred/alfred/internal/mcp/worker/visual_document"
+	workflowworker "github.com/alfred/alfred/internal/mcp/worker/workflow"
+	workspacebioimaging "github.com/alfred/alfred/internal/mcp/worker/workspace_bioimaging"
+	workspacedeck "github.com/alfred/alfred/internal/mcp/worker/workspace_deck"
+	workspaceintel "github.com/alfred/alfred/internal/mcp/worker/workspace_intel"
+	workspacemolecular "github.com/alfred/alfred/internal/mcp/worker/workspace_molecular"
+	workspaceomics "github.com/alfred/alfred/internal/mcp/worker/workspace_omics"
+	workspacesequence "github.com/alfred/alfred/internal/mcp/worker/workspace_sequence"
+	workspacespectra "github.com/alfred/alfred/internal/mcp/worker/workspace_spectra"
+	workspacetabular "github.com/alfred/alfred/internal/mcp/worker/workspace_tabular"
 	writeassist "github.com/alfred/alfred/internal/mcp/worker/write_assist"
 	"github.com/alfred/alfred/internal/model"
 	"github.com/alfred/alfred/internal/runtime"
@@ -30,7 +53,7 @@ import (
 	"github.com/alfred/alfred/web"
 )
 
-const version = "0.6.0-phase6"
+const version = "0.7.0-phase7"
 
 func main() {
 	cfg := config.Defaults()
@@ -65,13 +88,41 @@ func main() {
 		},
 	))
 
-	// 2b. Register 5 critical MCP workers with the broker.
+	// 2b. Register all MCP workers with the broker.
 	workers := map[string]*worker.WorkerServer{
+		// Phase 5
 		"mcp.search":       searchworker.NewSearchWorker(),
 		"mcp.model_router": modelrouter.NewModelRouterWorker(),
 		"mcp.plan_gateway": plangateway.NewPlanGatewayWorker(),
 		"mcp.write_assist": writeassist.NewWriteAssistWorker(),
 		"mcp.inspector":    runtimeinspector.NewInspectorWorker(),
+		// Phase 7a - Research
+		"mcp.paper_radar":      paperradar.NewPaperRadarServer(),
+		"mcp.multi_agent":      multiagent.NewMultiAgentServer(),
+		"mcp.sci_modality":     scimodality.NewSciModalityServer(),
+		"mcp.evidence_dag":     evidencedag.NewEvidenceDAGServer(),
+		"mcp.project_dag":      projectdag.NewProjectDAGServer(),
+		"mcp.feedback_gateway": feedbackgateway.NewFeedbackGatewayServer(),
+		"mcp.bgc_discovery":    bgcdiscovery.NewBGCDiscoveryServer(),
+		// Phase 7b - Content/Media
+		"mcp.image_generation":    imagegeneration.NewImageGenerationServer(),
+		"mcp.scientific_plotting": scientificplotting.NewScientificPlottingServer(),
+		"mcp.visual_document":     visualdocument.NewVisualDocumentServer(),
+		"mcp.ppt_master":          pptmaster.NewPPTMasterServer(),
+		// Phase 7c - Workspace
+		"mcp.workspace_intel":      workspaceintel.NewWorkspaceIntelServer(),
+		"mcp.workspace_bioimaging": workspacebioimaging.NewBioimagingServer(),
+		"mcp.workspace_deck":       workspacedeck.NewDeckServer(),
+		"mcp.workspace_molecular":  workspacemolecular.NewMolecularServer(),
+		"mcp.workspace_omics":      workspaceomics.NewOmicsServer(),
+		"mcp.workspace_sequence":   workspacesequence.NewSequenceServer(),
+		"mcp.workspace_spectra":    workspacespectra.NewSpectraServer(),
+		"mcp.workspace_tabular":    workspacetabular.NewTabularServer(),
+		// Phase 7d - System
+		"mcp.workflow":        workflowworker.NewWorkflowServer(),
+		"mcp.schedule":        scheduleservice.NewScheduleServer(),
+		"mcp.remote_executor": remoteexecutor.NewRemoteExecutorServer(),
+		"mcp.gui_owl":         guiowl.NewGUIOwlServer(),
 	}
 	for name, ws := range workers {
 		ws := ws

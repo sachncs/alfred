@@ -1,0 +1,11 @@
+{{define "project_dag_panel"}}
+<div class="neumorphic-card" style="padding:16px;margin:8px 0">
+  <h3 style="font-size:14px;color:var(--fg-accent);margin-bottom:12px">Project DAG</h3>
+  <div id="project-graph" style="min-height:200px;border:1px solid var(--border-subtle);border-radius:8px;padding:12px">
+    <p style="color:var(--fg-secondary);font-size:13px">No project nodes yet. The project graph builds from thread evidence.</p>
+  </div>
+  <div style="margin-top:12px;display:flex;gap:8px">
+    <button hx-post="/v1/capabilities/project-dag/dispatch" hx-vals='{"tool":"project_graph"}' hx-swap="none" class="btn-secondary" style="padding:6px 12px;border-radius:6px;font-size:12px">Refresh</button>
+  </div>
+</div>
+{{end}}
