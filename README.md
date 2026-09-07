@@ -1,0 +1,133 @@
+# Alfred
+
+A research workbench: a local agent runtime with structured tool calling, persistent threads, and a fleet of MCP workers (search, plotting, evidence DAG, image generation, and more).
+
+Phases 1-3 are complete: the OOP hierarchy, HTTP/SSE runtime with full turn loop, all built-in tools, and SQLite+JSONL persistence.
+
+## Architecture
+
+Alfred uses a four-level OOP hierarchy. Every interface has an abstract base (level 1), a package-level base that fills in shared wiring (level 2), one or more specializations (level 3), and one Alfred-specific implementation (level 4). Inheritance is via embedding (Go's composition), and polymorphism is via interface satisfaction.
+
+```
+level 1 (abstract)        Tool, Agent, MCPServer, Capability, Runtime
+level 2 (base)            FileSystemTool, ChatAgent, WorkerServer, Function, HTTPRuntime
+level 3 (specialization)  ReadTool,                                  ModelRouterWorker
+level 4 (Alfred-specific)                                      AlfredRuntime
+```
+
+### Layering
+
+```
+contract    ← wire types (Thread, Turn, Item, Error, wire schemas)
+interface   ← Tool, Agent, MCPServer, Capability, Runtime
+abstract    ← FileSystemTool, ChatAgent, WorkerServer, Function
+base        ← ReadTool,                                  HTTPRuntime
+specialization
+Alfred-specific
+```
+
+Each layer only depends on the layer(s) above it. `cmd/alfred/main.go` is the only file that imports every package.
+
+### Package layout
+
+```
+alfred/
+├── go.mod                       # module github.com/alfred/alfred (Go 1.22+)
+├── go.sum
+├── Makefile                     # build / test / vet / lint / run / clean
+├── .golangci.yml                # golangci-lint v2 config
+├── README.md
+├── CHANGELOG.md
+├── cmd/alfred/main.go           # orchestrator with SIGINT handling
+├── internal/
+│   ├── contract/                # shared wire types (Thread, Turn, Item, Error)
+│   │   └── testutil/            # fake builders for tests
+│   ├── tool/                    # Tool interface, Context, Result
+│   ├── fs/                      # FileSystemTool + Read/Write/Edit/ApplyPatch/Ls
+│   ├── exec/                    # BashTool (shell execution with timeout)
+│   ├── search/                  # GrepTool, FindTool
+│   ├── agent/                   # Agent interface, AgentState, ChatAgent
+│   ├── model/                   # model.Client interface, StubClient
+│   ├── mcp/                     # MCPServer, StdioTransport
+│   │   └── worker/              # WorkerServer abstract, EchoServer concrete
+│   ├── capability/              # Capability interface, Broker, Function
+│   ├── runtime/                 # HTTPRuntime, LocalRuntime, AlfredRuntime, turn loop
+│   ├── store/                   # SQLite + JSONL persistence, hybrid thread store
+│   ├── config/                  # CLI flags + env var configuration
+│   └── log/                     # Structured logging with secret redaction
+└── bin/alfred                   # built binary (gitignored)
+```
+
+## Run
+
+```bash
+# from ./alfred/
+make build    # produces ./bin/alfred
+make test     # runs go test -race -count=1 ./...
+make vet      # runs go vet ./...
+make lint     # runs golangci-lint run ./...
+make run      # build + run
+make clean    # remove ./bin/
+```
+
+## Phase 3 acceptance (verified)
+
+```bash
+$ make build
+Built bin/alfred
+
+$ make test
+... 15 packages, all OK under -race
+
+$ make vet
+go vet clean
+
+$ make lint
+0 issues.
+
+$ ./bin/alfred --port 8899
+2026/07/23 alfred 0.3.0-phase3 starting on port 8899 (db=~/.alfred/alfred.db)
+2026/07/23 mcp worker ready: id=echo-worker tools=1
+2026/07/23 hybrid store ready: sqlite=~/.alfred/alfred.db jsonl=~/.alfred/events
+2026/07/23 chat agent ready: id=alfred.chat tools=3
+2026/07/23 runtime ready
+2026/07/23 ready (Ctrl-C to exit)
+READY
+```
+
+### Health check
+
+```bash
+$ curl http://127.0.0.1:8899/v1/health
+{"status":"ok","version":"0.3.0-phase3","timestamp":"2026-07-23T..."}
+```
+
+### Create a thread
+
+```bash
+$ curl -X POST http://127.0.0.1:8899/v1/threads -d '{"title":"research"}'
+{"thread":{"id":"...","title":"research","status":"idle",...}}
+```
+
+## What's complete (Phases 1-3)
+
+- **Phase 1**: OOP hierarchy (Tool, Agent, MCPServer, Capability), ChatAgent, EchoServer, binary boot
+- **Phase 2**: HTTP/SSE runtime, turn loop with tool dispatch, compaction, token economy, history hygiene, steering queue, sub-agent delegation, usage tracking, tool budgets, prompt cache, memory store, skills loader, built-in tools (Read/Write/Edit/ApplyPatch/Bash/Grep/Find/Ls), code review, fork/resume, goals/todos, all HTTP routes
+- **Phase 3**: SQLite persistence (pure Go via modernc.org/sqlite), schema migrations, hybrid thread store (SQLite index + JSONL body), retention pruning, JSONL migration, legacy Kun config migration
+
+## What's NOT done yet
+
+Phase 4+ layers on:
+
+- Web UI (htmx + Go html/template) — Phase 4
+- All 28 MCP workers (search, model-router, plan-gateway, write-assist, etc.) — Phases 5/7
+- Capability broker and resource/file capabilities — Phase 5
+- Settings persistence (AppSettingsV1) — Phase 6
+- Research workers, paper radar, multi-agent — Phase 7a
+- Image generation, scientific plotting, visual documents — Phase 7b
+- Workspace previews — Phase 7c
+- Workflow engine, schedule tasks, remote executor — Phase 7d
+- UX features (plan mode, write mode, anchored comments) — Phase 8
+- Remote channel runtime, cutover from SciForge — Phase 9
+
+See `todo/` for the full plan.

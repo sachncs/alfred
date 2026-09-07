@@ -1,0 +1,12 @@
+{{define "evidence_dag_panel"}}
+<div class="neumorphic-card" style="padding:16px;margin:8px 0">
+  <h3 style="font-size:14px;color:var(--fg-accent);margin-bottom:12px">Evidence DAG</h3>
+  <div id="evidence-graph" style="min-height:200px;border:1px solid var(--border-subtle);border-radius:8px;padding:12px">
+    <p style="color:var(--fg-secondary);font-size:13px">No evidence claims yet. Start a research thread to build the evidence graph.</p>
+  </div>
+  <div style="margin-top:12px;display:flex;gap:8px">
+    <button hx-post="/v1/capabilities/evidence-dag/dispatch" hx-vals='{"tool":"evidence_snapshot"}' hx-swap="none" class="btn-secondary" style="padding:6px 12px;border-radius:6px;font-size:12px">Snapshot</button>
+    <button hx-post="/v1/capabilities/evidence-dag/dispatch" hx-vals='{"tool":"evidence_audit"}' hx-swap="none" class="btn-secondary" style="padding:6px 12px;border-radius:6px;font-size:12px">Audit</button>
+  </div>
+</div>
+{{end}}

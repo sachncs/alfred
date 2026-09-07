@@ -1,0 +1,18 @@
+{{define "todo_panel"}}
+{{if .Todos}}
+<div style="display:flex;flex-direction:column;gap:var(--ds-space-xs)">
+  {{range .Todos}}
+  <div class="ds-todo-item">
+    <div class="ds-todo-check {{if eq .Status "done"}}ds-todo-check-done{{end}}">
+      {{if eq .Status "done"}}✓{{end}}
+    </div>
+    <span {{if eq .Status "done"}}style="text-decoration:line-through;color:var(--ds-text-faint)"{{end}}>{{.Title}}</span>
+  </div>
+  {{end}}
+</div>
+{{else}}
+<div style="color:var(--ds-text-faint);font-size:var(--ds-font-size-sm);text-align:center;padding:var(--ds-space-md)">
+  No todos
+</div>
+{{end}}
+{{end}}

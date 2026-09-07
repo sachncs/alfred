@@ -1,0 +1,71 @@
+/* Neumorphic design tokens — Alfred dark mode
+   Reference: 00-ui-ux-design-reference.md
+   ponytail: single CSS file, no preprocessor needed */
+
+:root {
+  /* === Base palette === */
+  --ds-bg-canvas: #000000;
+  --ds-text: #f5f0e1;
+  --ds-text-muted: #d4cdb8;
+  --ds-text-faint: #9a9480;
+  --ds-accent: #c4a35a;
+  --ds-accent-soft: rgba(196, 163, 90, 0.15);
+  --ds-danger: #c45a5a;
+  --ds-success: #5ac45a;
+
+  /* === Neumorphic surfaces === */
+  --ds-neuro-surface: #0d0d0d;
+  --ds-neuro-surface-raised: #141414;
+  --ds-neuro-surface-sunken: #080808;
+  --ds-neuro-surface-hover: #1a1a1a;
+  --ds-neuro-surface-active: #111111;
+
+  /* === Neumorphic shadows (dual shadow: dark BR + light TL) === */
+  --ds-neuro-shadow-raised: 8px 8px 16px rgba(0,0,0,0.85), -2px -2px 8px rgba(245,240,225,0.025);
+  --ds-neuro-shadow-raised-sm: 4px 4px 8px rgba(0,0,0,0.85), -1px -1px 4px rgba(245,240,225,0.025);
+  --ds-neuro-shadow-raised-lg: 12px 12px 24px rgba(0,0,0,0.85), -3px -3px 12px rgba(245,240,225,0.025);
+  --ds-neuro-shadow-pressed: inset 4px 4px 8px rgba(0,0,0,0.85), inset -1px -1px 4px rgba(245,240,225,0.025);
+  --ds-neuro-shadow-pressed-sm: inset 2px 2px 4px rgba(0,0,0,0.85), inset -1px -1px 2px rgba(245,240,225,0.025);
+  --ds-neuro-shadow-floating: 12px 12px 24px rgba(0,0,0,0.9), -3px -3px 12px rgba(245,240,225,0.03);
+
+  /* === Neumorphic pill / control === */
+  --ds-neuro-pill-active: linear-gradient(135deg, #1f1f1f, #0a0a0a);
+  --ds-neuro-pill-active-shadow: inset 3px 3px 6px rgba(0,0,0,0.8), inset -1px -1px 3px rgba(245,240,225,0.02);
+  --ds-neuro-track: var(--ds-neuro-surface-sunken);
+  --ds-neuro-track-shadow: var(--ds-neuro-shadow-pressed-sm);
+
+  /* === Neumorphic border === */
+  --ds-neuro-border: rgba(245, 240, 225, 0.06);
+  --ds-neuro-border-strong: rgba(245, 240, 225, 0.12);
+
+  /* === Radius === */
+  --ds-radius-pill: 999px;
+  --ds-radius-card: 24px;
+  --ds-radius-card-lg: 28px;
+  --ds-radius-sm: 12px;
+  --ds-radius-xs: 8px;
+
+  /* === Spacing === */
+  --ds-space-xs: 4px;
+  --ds-space-sm: 8px;
+  --ds-space-md: 16px;
+  --ds-space-lg: 24px;
+  --ds-space-xl: 32px;
+
+  /* === Typography === */
+  --ds-font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  --ds-font-mono: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+  --ds-font-size-sm: 0.8125rem;
+  --ds-font-size-base: 0.875rem;
+  --ds-font-size-lg: 1rem;
+  --ds-font-size-xl: 1.25rem;
+
+  /* === Transitions === */
+  --ds-transition-fast: 120ms ease;
+  --ds-transition-base: 200ms ease;
+
+  /* === Z-index === */
+  --ds-z-sidebar: 10;
+  --ds-z-modal: 100;
+  --ds-z-toast: 200;
+}

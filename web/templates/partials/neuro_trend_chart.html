@@ -1,0 +1,12 @@
+{{define "neuro_trend_chart.html"}}
+<svg class="ds-trend-chart" viewBox="0 0 300 120" preserveAspectRatio="none">
+  <defs>
+    <linearGradient id="ds-trend-gradient" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#c4a35a" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#c4a35a" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <path class="ds-trend-area" d="M0,120 L0,80 L43,60 L86,65 L129,40 L172,45 L215,20 L258,25 L300,10 L300,120 Z"/>
+  <polyline class="ds-trend-line" points="0,80 43,60 86,65 129,40 172,45 215,20 258,25 300,10"/>
+</svg>
+{{end}}

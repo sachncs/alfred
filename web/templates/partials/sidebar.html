@@ -1,0 +1,31 @@
+{{define "sidebar"}}
+<div style="display:flex;flex-direction:column;height:100%">
+  <div style="padding:var(--ds-space-md);display:flex;gap:var(--ds-space-sm)">
+    <form hx-post="/ui/threads" hx-target="#sidebar" hx-swap="innerHTML"
+          style="display:flex;gap:4px;flex:1"
+          hx-on::after-request="this.reset();htmx.trigger('#timeline','refresh')">
+      <input name="title" class="ds-input" placeholder="New thread..." style="flex:1"
+             hx-on::keydown="if(event.key==='Enter'){event.preventDefault();this.closest('form').requestSubmit()}">
+      <button type="submit" class="ds-btn ds-btn-primary ds-btn-sm">+</button>
+    </form>
+  </div>
+
+  <div style="flex:1;overflow-y:auto;padding:0 var(--ds-space-sm)">
+    {{range .Threads}}
+    <div class="ds-thread-row {{if .Active}}ds-thread-row-active{{end}}"
+         hx-get="/ui/threads/{{.ID}}/timeline"
+         hx-target="#timeline"
+         hx-swap="innerHTML"
+         hx-trigger="click"
+         hx-on::click="document.querySelectorAll('.ds-thread-row').forEach(e=>e.classList.remove('ds-thread-row-active'));this.classList.add('ds-thread-row-active')">
+      <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{.Title}}</span>
+    </div>
+    {{end}}
+    {{if not .Threads}}
+    <div style="padding:var(--ds-space-md);color:var(--ds-text-faint);font-size:var(--ds-font-size-sm);text-align:center">
+      No threads yet
+    </div>
+    {{end}}
+  </div>
+</div>
+{{end}}
