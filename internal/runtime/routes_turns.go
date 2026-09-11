@@ -49,6 +49,7 @@ func (r *LocalRuntime) handleStartTurn(w http.ResponseWriter, req *http.Request)
 	if sql := r.sqlStore(); sql != nil {
 		if err := sql.InsertTurn(turn); err != nil {
 			defaultTurnLog.Printf("insert turn row %s: %v", turnID, err)
+			w.Header().Set("X-Alfred-Persistence-Error", err.Error())
 		}
 	}
 
@@ -171,6 +172,7 @@ func (r *LocalRuntime) executeTurn(ctx context.Context, ar *AlfredRuntime, threa
 		}
 		if uerr := sql.UpdateTurn(turn); uerr != nil {
 			defaultTurnLog.Printf("update turn row %s: %v", turnID, uerr)
+			ar.PublishEvent(thread.ID, SSEEvent{Event: "turn.persistence_error", Data: map[string]string{"turnId": string(turnID), "error": uerr.Error()}})
 		}
 	}
 
