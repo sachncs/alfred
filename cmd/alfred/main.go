@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"github.com/sachncs/alfred/internal/agent"
+	"github.com/sachncs/alfred/internal/buildinfo"
 	"github.com/sachncs/alfred/internal/capability"
 	"github.com/sachncs/alfred/internal/config"
 	"github.com/sachncs/alfred/internal/contract"
@@ -53,21 +54,20 @@ import (
 	"github.com/sachncs/alfred/web"
 )
 
-const version = "0.7.0-phase7"
-
 func main() {
 	cfg := config.Defaults()
+	cfg.Version = buildinfo.Version
 	showVersion := config.RegisterFlags(&cfg)
 	flag.Parse()
 
 	if *showVersion {
-		fmt.Printf("alfred %s\n", version)
+		fmt.Printf("alfred %s\n", buildinfo.Version)
 		return
 	}
 
 	cfg.ApplyEnv()
 	log.SetFlags(log.LstdFlags | log.Lmicroseconds)
-	log.Printf("alfred %s starting on port %d (db=%s)", version, cfg.Port, cfg.DBPath)
+	log.Printf("alfred %s starting on port %d (db=%s)", buildinfo.Version, cfg.Port, cfg.DBPath)
 
 	// 1. Capability broker
 	broker := capability.NewBroker()
