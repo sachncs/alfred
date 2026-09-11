@@ -19,7 +19,7 @@ func NewBinding(b *Broker) *Binding {
 }
 
 // Bind binds a resource to a capability. The capability must be a ResourceCapability.
-func (b *Binding) Bind(_ context.Context, id ID, handle any) error {
+func (b *Binding) Bind(ctx context.Context, id ID, handle any) error {
 	c := b.capBroker.Get(id)
 	if c == nil {
 		return ErrUnknownCapability
@@ -28,10 +28,10 @@ func (b *Binding) Bind(_ context.Context, id ID, handle any) error {
 	if !ok {
 		return fmt.Errorf("capability %s does not support resource binding", id)
 	}
-	if err := rc.Bind(context.Background(), handle); err != nil {
+	if err := rc.Bind(ctx, handle); err != nil {
 		return err
 	}
-	r, _ := rc.TakeResource(context.Background())
+	r, _ := rc.TakeResource(ctx)
 	b.mu.Lock()
 	b.bindings[id] = r
 	b.mu.Unlock()
