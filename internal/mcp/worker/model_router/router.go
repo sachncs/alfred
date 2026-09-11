@@ -11,9 +11,12 @@ import (
 	"strings"
 	"time"
 
+	internallog "github.com/sachncs/alfred/internal/log"
 	"github.com/sachncs/alfred/internal/mcp/worker"
 	"github.com/sachncs/alfred/internal/tool"
 )
+
+var errLog = internallog.New()
 
 // NewModelRouterWorker creates a model-router MCP worker.
 // ponytail: proxies to upstream API based on model prefix.
@@ -101,7 +104,8 @@ func (p *proxyTool) proxyOpenAI(ctx context.Context, in proxyInput) (*tool.Resul
 
 	respBody, _ := io.ReadAll(resp.Body)
 	if resp.StatusCode != 200 {
-		return tool.FailureMsg(fmt.Sprintf("openai %d: %s", resp.StatusCode, string(respBody))), nil
+		errLog.Printf("model_router: openai %d body=%s", resp.StatusCode, internallog.Redact(string(respBody)))
+		return tool.FailureMsg(fmt.Sprintf("openai %d: %s", resp.StatusCode, truncateSnippet(respBody))), nil
 	}
 
 	var result struct {
@@ -150,7 +154,8 @@ func (p *proxyTool) proxyAnthropic(ctx context.Context, in proxyInput) (*tool.Re
 
 	respBody, _ := io.ReadAll(resp.Body)
 	if resp.StatusCode != 200 {
-		return tool.FailureMsg(fmt.Sprintf("anthropic %d: %s", resp.StatusCode, string(respBody))), nil
+		errLog.Printf("model_router: anthropic %d body=%s", resp.StatusCode, internallog.Redact(string(respBody)))
+		return tool.FailureMsg(fmt.Sprintf("anthropic %d: %s", resp.StatusCode, truncateSnippet(respBody))), nil
 	}
 
 	var result struct {
@@ -165,4 +170,15 @@ func (p *proxyTool) proxyAnthropic(ctx context.Context, in proxyInput) (*tool.Re
 		content = result.Content[0].Text
 	}
 	return tool.SuccessWith(content, json.RawMessage(respBody)), nil
+}
+
+// truncateSnippet returns the first 256 bytes of body, appending a
+// truncation marker if the body was longer. Used so error messages do not
+// amplify leaked upstream content into the model context.
+func truncateSnippet(body []byte) string {
+	const limit = 256
+	if len(body) <= limit {
+		return string(body)
+	}
+	return string(body[:limit]) + "... [truncated]"
 }
