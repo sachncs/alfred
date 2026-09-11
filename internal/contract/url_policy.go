@@ -9,8 +9,15 @@ type URLPolicy struct {
 	allowedHosts   map[string]bool // nil = all hosts allowed for allowed schemes
 }
 
-// NewURLPolicy creates a policy allowing https and http.
+// NewURLPolicy creates a strict policy allowing only https.
 func NewURLPolicy() *URLPolicy {
+	return &URLPolicy{
+		allowedSchemes: map[string]bool{"https": true},
+	}
+}
+
+// NewURLPolicyPermissive creates a permissive policy allowing https, http, and mailto.
+func NewURLPolicyPermissive() *URLPolicy {
 	return &URLPolicy{
 		allowedSchemes: map[string]bool{"https": true, "http": true, "mailto": true},
 	}
@@ -19,7 +26,6 @@ func NewURLPolicy() *URLPolicy {
 // NewURLPolicyStrict creates a policy allowing only https for specific hosts.
 func NewURLPolicyStrict(hosts []string) *URLPolicy {
 	p := NewURLPolicy()
-	p.allowedSchemes = map[string]bool{"https": true}
 	p.allowedHosts = make(map[string]bool, len(hosts))
 	for _, h := range hosts {
 		p.allowedHosts[h] = true
