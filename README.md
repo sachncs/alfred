@@ -1,8 +1,31 @@
 # Alfred
 
-A research workbench: a local agent runtime with structured tool calling, persistent threads, and a fleet of MCP workers (search, plotting, evidence DAG, image generation, and more).
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
+[![CI](https://img.shields.io/github/actions/workflow/status/sachncs/alfred/ci.yml?branch=master&label=ci)](./.github/workflows/ci.yml)
+[![Go Report Card](https://goreportcard.com/badge/github.com/sachncs/alfred)](https://goreportcard.com/report/github.com/sachncs/alfred)
 
-Phases 1-3 are complete: the OOP hierarchy, HTTP/SSE runtime with full turn loop, all built-in tools, and SQLite+JSONL persistence.
+**A local-first research agent runtime for scientists, engineers, and tool builders.**
+
+Alfred runs an HTTP/SSE turn loop on your machine, persists every thread to
+SQLite, and ships with 25+ MCP workers — search, plotting, evidence DAG,
+image generation, scientific computing, and more. No external services
+required for the local runtime.
+
+## Quick start
+
+```bash
+git clone https://github.com/sachncs/alfred
+cd alfred
+make build
+./bin/alfred --port 8899
+```
+
+## What's inside
+
+- **Turn loop** with structured tool calling and tool budgets.
+- **Persistence** via SQLite + JSONL (hybrid thread store, WAL, foreign keys).
+- **Web UI** under `/` (htmx + Go html/template).
+- **Workers**: search, paper radar, multi-agent, image generation, evidence DAG, project DAG, scientific plotting, visual documents, schedule, workflow, and 15 more — see [`docs/workers/`](./docs/workers/README.md).
 
 ## Architecture
 
