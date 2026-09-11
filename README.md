@@ -130,4 +130,4 @@ Phase 4+ layers on:
 - UX features (plan mode, write mode, anchored comments) — Phase 8
 - Remote channel runtime, cutover from SciForge — Phase 9
 
-See [`docs/ROADMAP.md`](./docs/ROADMAP.md) for the full plan.
+See [`docs/ROADMAP.md`](./docs/ROADMAP.md) for the full plan and [`docs/workers/`](./docs/workers/README.md) for the per-worker reference.
