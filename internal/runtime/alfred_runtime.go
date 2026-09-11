@@ -174,7 +174,11 @@ func (r *AlfredRuntime) handleSSE(w http.ResponseWriter, req *http.Request) {
 // PublishEvent sends an event to all subscribers of a thread and appends to replay buffer.
 func (r *AlfredRuntime) PublishEvent(threadID contract.ThreadID, ev SSEEvent) {
 	r.replayMu.Lock()
-	r.replayBuf[threadID] = append(r.replayBuf[threadID], ev)
+	buf := append(r.replayBuf[threadID], ev)
+	if len(buf) > maxReplayPerThread {
+		buf = buf[len(buf)-maxReplayPerThread:]
+	}
+	r.replayBuf[threadID] = buf
 	r.replayMu.Unlock()
 
 	r.subsMu.RLock()
@@ -189,6 +193,10 @@ func (r *AlfredRuntime) PublishEvent(threadID contract.ThreadID, ev SSEEvent) {
 		}
 	}
 }
+
+// maxReplayPerThread caps the per-thread SSE replay buffer so the
+// process cannot accumulate unbounded memory on long-lived threads.
+const maxReplayPerThread = 256
 
 func writeSSE(w http.ResponseWriter, ev SSEEvent) {
 	if ev.ID != "" {
