@@ -88,6 +88,7 @@ func (r *AlfredRuntime) StartTurn(thread *contract.Thread, input contract.UserIn
 	if sql := r.sqlStore(); sql != nil {
 		if err := sql.InsertTurn(turn); err != nil {
 			defaultTurnLog.Printf("web: insert turn row %s: %v", turnID, err)
+			r.PublishEvent(thread.ID, SSEEvent{Event: "turn.persistence_error", Data: map[string]string{"turnId": string(turnID), "error": err.Error()}})
 		}
 	}
 
