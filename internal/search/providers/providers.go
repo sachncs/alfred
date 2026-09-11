@@ -3,6 +3,7 @@ package providers
 
 import (
 	"context"
+	"io"
 	"net/http"
 	"net/url"
 	"strings"
@@ -27,6 +28,10 @@ type Provider interface {
 
 var httpClient = &http.Client{Timeout: 15 * time.Second}
 
+// maxResponseBytes caps a single provider response to avoid pathological
+// upstream payloads eating memory.
+const maxResponseBytes = 10 << 20 // 10 MiB
+
 func doGet(ctx context.Context, url string) ([]byte, error) {
 	req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
 	if err != nil {
@@ -38,9 +43,7 @@ func doGet(ctx context.Context, url string) ([]byte, error) {
 		return nil, err
 	}
 	defer func() { _ = resp.Body.Close() }()
-	var buf [64 * 1024]byte
-	n, _ := resp.Body.Read(buf[:])
-	return buf[:n], nil
+	return io.ReadAll(io.LimitReader(resp.Body, maxResponseBytes))
 }
 
 func doPost(ctx context.Context, url, contentType string, body []byte) ([]byte, error) {
@@ -55,9 +58,7 @@ func doPost(ctx context.Context, url, contentType string, body []byte) ([]byte, 
 		return nil, err
 	}
 	defer func() { _ = resp.Body.Close() }()
-	var buf [64 * 1024]byte
-	n, _ := resp.Body.Read(buf[:])
-	return buf[:n], nil
+	return io.ReadAll(io.LimitReader(resp.Body, maxResponseBytes))
 }
 
 func encodeQuery(q string) string {
