@@ -11,8 +11,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/alfred/alfred/internal/mcp/worker"
-	"github.com/alfred/alfred/internal/tool"
+	"github.com/sachncs/alfred/internal/mcp/worker"
+	"github.com/sachncs/alfred/internal/tool"
 )
 
 // ColumnInfo describes a column in the tabular data.

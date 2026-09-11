@@ -11,8 +11,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/alfred/alfred/internal/mcp"
-	"github.com/alfred/alfred/internal/tool"
+	"github.com/sachncs/alfred/internal/mcp"
+	"github.com/sachncs/alfred/internal/tool"
 )
 
 // Compile-time interface conformance.

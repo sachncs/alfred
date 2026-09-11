@@ -4,7 +4,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/alfred/alfred/internal/contract"
+	"github.com/sachncs/alfred/internal/contract"
 )
 
 // AgentState is the in-memory state of a running agent instance.

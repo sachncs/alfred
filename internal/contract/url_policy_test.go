@@ -3,7 +3,7 @@ package contract_test
 import (
 	"testing"
 
-	"github.com/alfred/alfred/internal/contract"
+	"github.com/sachncs/alfred/internal/contract"
 )
 
 func TestURLPolicyIsSafe(t *testing.T) {

@@ -12,7 +12,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/alfred/alfred/internal/mcp"
+	"github.com/sachncs/alfred/internal/mcp"
 )
 
 // FileBridgeClient communicates with a worker subprocess via HMAC-signed JSON files.

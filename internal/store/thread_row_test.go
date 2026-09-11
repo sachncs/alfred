@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/alfred/alfred/internal/contract"
+	"github.com/sachncs/alfred/internal/contract"
 )
 
 func newTestSQLite(t *testing.T) *SQLite {

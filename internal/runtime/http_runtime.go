@@ -7,8 +7,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/alfred/alfred/internal/contract"
-	"github.com/alfred/alfred/internal/tool"
+	"github.com/sachncs/alfred/internal/contract"
+	"github.com/sachncs/alfred/internal/tool"
 )
 
 // HTTPRuntime is a level-2 runtime that serves the HTTP API.

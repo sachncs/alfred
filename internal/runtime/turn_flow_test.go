@@ -11,9 +11,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/alfred/alfred/internal/contract"
-	"github.com/alfred/alfred/internal/model"
-	"github.com/alfred/alfred/internal/store"
+	"github.com/sachncs/alfred/internal/contract"
+	"github.com/sachncs/alfred/internal/model"
+	"github.com/sachncs/alfred/internal/store"
 )
 
 // slowClient emits a DeltaText chunk after a delay. If the context is cancelled

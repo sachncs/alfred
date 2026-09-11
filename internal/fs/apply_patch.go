@@ -7,7 +7,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/alfred/alfred/internal/tool"
+	"github.com/sachncs/alfred/internal/tool"
 )
 
 // ApplyPatchInput is the JSON schema for ApplyPatchTool input.

@@ -6,9 +6,9 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/alfred/alfred/internal/contract"
-	internallog "github.com/alfred/alfred/internal/log"
-	"github.com/alfred/alfred/internal/store"
+	"github.com/sachncs/alfred/internal/contract"
+	internallog "github.com/sachncs/alfred/internal/log"
+	"github.com/sachncs/alfred/internal/store"
 )
 
 // defaultTurnLog is the package logger for turn-related events.

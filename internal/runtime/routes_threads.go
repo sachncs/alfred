@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/alfred/alfred/internal/contract"
+	"github.com/sachncs/alfred/internal/contract"
 )
 
 func (r *LocalRuntime) handleListThreads(w http.ResponseWriter, req *http.Request) {

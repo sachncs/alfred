@@ -11,7 +11,7 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/alfred/alfred/internal/mcp"
+	"github.com/sachncs/alfred/internal/mcp"
 )
 
 // StreamableHTTPClient connects to an MCP server over bidirectional HTTP streaming.

@@ -6,9 +6,9 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/alfred/alfred/internal/agent"
-	"github.com/alfred/alfred/internal/contract"
-	"github.com/alfred/alfred/internal/tool"
+	"github.com/sachncs/alfred/internal/agent"
+	"github.com/sachncs/alfred/internal/contract"
+	"github.com/sachncs/alfred/internal/tool"
 )
 
 // stubAgent is a minimal Agent implementation for testing the contract.

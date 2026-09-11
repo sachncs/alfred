@@ -8,9 +8,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/alfred/alfred/internal/mcp/worker"
-	"github.com/alfred/alfred/internal/search/providers"
-	"github.com/alfred/alfred/internal/tool"
+	"github.com/sachncs/alfred/internal/mcp/worker"
+	"github.com/sachncs/alfred/internal/search/providers"
+	"github.com/sachncs/alfred/internal/tool"
 )
 
 // paperStore is a thread-safe in-memory store for paper metadata.

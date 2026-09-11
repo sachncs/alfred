@@ -1,6 +1,6 @@
 package settings
 
-import "github.com/alfred/alfred/internal/contract"
+import "github.com/sachncs/alfred/internal/contract"
 
 // Normalize takes a partial AppSettingsV1 and fills in missing fields with defaults.
 func Normalize(partial contract.AppSettingsV1) contract.AppSettingsV1 {

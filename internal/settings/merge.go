@@ -1,6 +1,6 @@
 package settings
 
-import "github.com/alfred/alfred/internal/contract"
+import "github.com/sachncs/alfred/internal/contract"
 
 // Merge deep-merges a partial AppSettingsV1 into an existing one.
 // Non-zero fields in partial overwrite base; zero fields are kept from base.

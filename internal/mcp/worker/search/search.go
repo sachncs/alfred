@@ -6,9 +6,9 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/alfred/alfred/internal/mcp/worker"
-	"github.com/alfred/alfred/internal/search/providers"
-	"github.com/alfred/alfred/internal/tool"
+	"github.com/sachncs/alfred/internal/mcp/worker"
+	"github.com/sachncs/alfred/internal/search/providers"
+	"github.com/sachncs/alfred/internal/tool"
 )
 
 // SearchInput is the input schema for the research_search tool.

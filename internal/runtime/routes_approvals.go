@@ -3,7 +3,7 @@ package runtime
 import (
 	"net/http"
 
-	"github.com/alfred/alfred/internal/contract"
+	"github.com/sachncs/alfred/internal/contract"
 )
 
 func (r *LocalRuntime) handleResolveApproval(w http.ResponseWriter, req *http.Request) {

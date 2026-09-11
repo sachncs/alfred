@@ -3,7 +3,7 @@ package store
 import (
 	"testing"
 
-	"github.com/alfred/alfred/internal/contract"
+	"github.com/sachncs/alfred/internal/contract"
 )
 
 func TestFileSessionStoreAppendAndRead(t *testing.T) {

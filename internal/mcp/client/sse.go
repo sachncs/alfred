@@ -11,7 +11,7 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/alfred/alfred/internal/mcp"
+	"github.com/sachncs/alfred/internal/mcp"
 )
 
 // SSEClient connects to an MCP server over SSE + HTTP POST.

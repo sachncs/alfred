@@ -3,7 +3,7 @@ package runtime
 import (
 	"strconv"
 
-	"github.com/alfred/alfred/internal/contract"
+	"github.com/sachncs/alfred/internal/contract"
 )
 
 // CompactionMode controls how aggressively older turns are removed.

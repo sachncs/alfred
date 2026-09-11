@@ -3,7 +3,7 @@ package mcp_test
 import (
 	"testing"
 
-	"github.com/alfred/alfred/internal/mcp"
+	"github.com/sachncs/alfred/internal/mcp"
 )
 
 func TestBM25Search(t *testing.T) {

@@ -9,10 +9,10 @@ import (
 	"sync"
 	"time"
 
-	"github.com/alfred/alfred/internal/contract"
-	"github.com/alfred/alfred/internal/model"
-	"github.com/alfred/alfred/internal/settings"
-	"github.com/alfred/alfred/internal/store"
+	"github.com/sachncs/alfred/internal/contract"
+	"github.com/sachncs/alfred/internal/model"
+	"github.com/sachncs/alfred/internal/settings"
+	"github.com/sachncs/alfred/internal/store"
 )
 
 // SSEEvent is a server-sent event.

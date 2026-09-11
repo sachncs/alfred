@@ -3,7 +3,7 @@ package client_test
 import (
 	"testing"
 
-	"github.com/alfred/alfred/internal/mcp/client"
+	"github.com/sachncs/alfred/internal/mcp/client"
 )
 
 func TestFileBridgeSignVerify(t *testing.T) {

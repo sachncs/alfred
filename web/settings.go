@@ -5,7 +5,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/alfred/alfred/internal/contract"
+	"github.com/sachncs/alfred/internal/contract"
 )
 
 // SettingsLoader loads persisted settings.

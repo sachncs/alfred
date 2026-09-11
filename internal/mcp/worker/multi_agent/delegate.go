@@ -7,8 +7,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/alfred/alfred/internal/mcp/worker"
-	"github.com/alfred/alfred/internal/tool"
+	"github.com/sachncs/alfred/internal/mcp/worker"
+	"github.com/sachncs/alfred/internal/tool"
 )
 
 // TaskStatus represents the lifecycle state of a delegated task.

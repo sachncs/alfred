@@ -7,8 +7,8 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/alfred/alfred/internal/mcp"
-	"github.com/alfred/alfred/internal/tool"
+	"github.com/sachncs/alfred/internal/mcp"
+	"github.com/sachncs/alfred/internal/tool"
 )
 
 // WorkerServer is the abstract base for any concrete MCP worker.

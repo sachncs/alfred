@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"time"
 
-	"github.com/alfred/alfred/internal/contract"
+	"github.com/sachncs/alfred/internal/contract"
 )
 
 // TurnRow mirrors the turns table.

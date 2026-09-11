@@ -1,6 +1,6 @@
 package settings
 
-import "github.com/alfred/alfred/internal/contract"
+import "github.com/sachncs/alfred/internal/contract"
 
 // DefaultAppSettings returns a populated AppSettingsV1 with safe defaults.
 func DefaultAppSettings() contract.AppSettingsV1 {

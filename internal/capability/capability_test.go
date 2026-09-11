@@ -9,7 +9,7 @@ import (
 	"sync/atomic"
 	"testing"
 
-	"github.com/alfred/alfred/internal/capability"
+	"github.com/sachncs/alfred/internal/capability"
 )
 
 func TestBrokerRegisterAndDispatch(t *testing.T) {

@@ -11,7 +11,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/alfred/alfred/internal/tool"
+	"github.com/sachncs/alfred/internal/tool"
 )
 
 // GrepInput is the JSON schema for GrepTool input.

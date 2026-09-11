@@ -8,9 +8,9 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/alfred/alfred/internal/fs"
-	"github.com/alfred/alfred/internal/mcp/worker"
-	"github.com/alfred/alfred/internal/tool"
+	"github.com/sachncs/alfred/internal/fs"
+	"github.com/sachncs/alfred/internal/mcp/worker"
+	"github.com/sachncs/alfred/internal/tool"
 )
 
 func NewWorkspaceIntelServer() *worker.WorkerServer {

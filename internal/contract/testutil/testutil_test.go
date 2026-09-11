@@ -3,8 +3,8 @@ package testutil_test
 import (
 	"testing"
 
-	"github.com/alfred/alfred/internal/contract"
-	"github.com/alfred/alfred/internal/contract/testutil"
+	"github.com/sachncs/alfred/internal/contract"
+	"github.com/sachncs/alfred/internal/contract/testutil"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

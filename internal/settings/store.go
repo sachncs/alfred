@@ -3,7 +3,7 @@ package settings
 import (
 	"encoding/json"
 
-	"github.com/alfred/alfred/internal/contract"
+	"github.com/sachncs/alfred/internal/contract"
 )
 
 const settingsNamespace = "app"

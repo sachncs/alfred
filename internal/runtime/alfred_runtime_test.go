@@ -9,8 +9,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/alfred/alfred/internal/contract"
-	"github.com/alfred/alfred/internal/store"
+	"github.com/sachncs/alfred/internal/contract"
+	"github.com/sachncs/alfred/internal/store"
 )
 
 func newTestAlfredRuntime(t *testing.T) *AlfredRuntime {

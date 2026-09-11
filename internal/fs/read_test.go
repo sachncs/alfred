@@ -9,7 +9,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/alfred/alfred/internal/tool"
+	"github.com/sachncs/alfred/internal/tool"
 )
 
 // helper: write a fixture and return its absolute path.

@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/alfred/alfred/internal/tool"
+	"github.com/sachncs/alfred/internal/tool"
 )
 
 func TestBashToolEcho(t *testing.T) {

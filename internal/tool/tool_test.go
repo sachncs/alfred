@@ -8,7 +8,7 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/alfred/alfred/internal/tool"
+	"github.com/sachncs/alfred/internal/tool"
 )
 
 // stubTool is a minimal Tool implementation used to verify the

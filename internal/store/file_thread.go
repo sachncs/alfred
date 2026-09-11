@@ -11,7 +11,7 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/alfred/alfred/internal/contract"
+	"github.com/sachncs/alfred/internal/contract"
 )
 
 // FileThreadStore persists threads as individual JSON files in a directory.
