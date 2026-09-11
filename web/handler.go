@@ -10,7 +10,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/alfred/alfred/internal/contract"
+	"github.com/sachncs/alfred/internal/contract"
 )
 
 //go:embed templates/layout.html templates/pages/*.html templates/partials/*.html

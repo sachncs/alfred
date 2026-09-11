@@ -10,7 +10,7 @@ import (
 	"os/exec"
 	"sync"
 
-	"github.com/alfred/alfred/internal/mcp"
+	"github.com/sachncs/alfred/internal/mcp"
 )
 
 // Client is a connection to a remote MCP server.

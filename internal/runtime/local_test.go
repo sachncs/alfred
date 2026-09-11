@@ -6,8 +6,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/alfred/alfred/internal/contract"
-	"github.com/alfred/alfred/internal/store"
+	"github.com/sachncs/alfred/internal/contract"
+	"github.com/sachncs/alfred/internal/store"
 )
 
 func newTestLocalRuntime(t *testing.T) *LocalRuntime {

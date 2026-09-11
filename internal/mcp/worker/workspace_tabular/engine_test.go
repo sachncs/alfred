@@ -8,7 +8,7 @@ import (
 	"strings"
 	"testing"
 
-	alfredtool "github.com/alfred/alfred/internal/tool"
+	alfredtool "github.com/sachncs/alfred/internal/tool"
 )
 
 func TestTabularPreviewTool(t *testing.T) {

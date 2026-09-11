@@ -1,7 +1,7 @@
 package runtime
 
 import (
-	"github.com/alfred/alfred/internal/tool"
+	"github.com/sachncs/alfred/internal/tool"
 )
 
 // LocalRuntime is a level-3 runtime that wires all /v1/ routes.

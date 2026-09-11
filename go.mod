@@ -1,4 +1,4 @@
-module github.com/alfred/alfred
+module github.com/sachncs/alfred
 
 go 1.25.0
 

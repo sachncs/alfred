@@ -3,8 +3,8 @@ package runtime
 import (
 	"context"
 
-	"github.com/alfred/alfred/internal/agent"
-	"github.com/alfred/alfred/internal/contract"
+	"github.com/sachncs/alfred/internal/agent"
+	"github.com/sachncs/alfred/internal/contract"
 )
 
 // AgentBridge connects a ChatAgent to the runtime's turn loop.

@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/alfred/alfred/internal/contract"
+	"github.com/sachncs/alfred/internal/contract"
 )
 
 // HybridThreadStore reads thread metadata from SQLite and messages/events

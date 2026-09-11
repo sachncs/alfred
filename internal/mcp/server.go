@@ -8,7 +8,7 @@ import (
 	"encoding/json"
 	"errors"
 
-	"github.com/alfred/alfred/internal/tool"
+	"github.com/sachncs/alfred/internal/tool"
 )
 
 // Server is the base interface every concrete MCP server must satisfy.

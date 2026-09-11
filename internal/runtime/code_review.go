@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/alfred/alfred/internal/model"
+	"github.com/sachncs/alfred/internal/model"
 )
 
 // CodeReviewer uses the model to review code changes.

@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/alfred/alfred/internal/tool"
+	"github.com/sachncs/alfred/internal/tool"
 )
 
 // FileSystemTool is the abstract base for any tool that operates on

@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 	"testing"
 
-	"github.com/alfred/alfred/internal/search/providers"
-	"github.com/alfred/alfred/internal/tool"
+	"github.com/sachncs/alfred/internal/search/providers"
+	"github.com/sachncs/alfred/internal/tool"
 )
 
 func TestPaperSearchTool(t *testing.T) {

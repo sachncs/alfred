@@ -7,10 +7,10 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/alfred/alfred/internal/agent"
-	"github.com/alfred/alfred/internal/contract"
-	"github.com/alfred/alfred/internal/model"
-	"github.com/alfred/alfred/internal/tool"
+	"github.com/sachncs/alfred/internal/agent"
+	"github.com/sachncs/alfred/internal/contract"
+	"github.com/sachncs/alfred/internal/model"
+	"github.com/sachncs/alfred/internal/tool"
 )
 
 // countingTool is a minimal tool that records calls and returns OK.

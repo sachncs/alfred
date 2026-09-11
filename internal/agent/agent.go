@@ -4,8 +4,8 @@ package agent
 import (
 	"context"
 
-	"github.com/alfred/alfred/internal/contract"
-	"github.com/alfred/alfred/internal/tool"
+	"github.com/sachncs/alfred/internal/contract"
+	"github.com/sachncs/alfred/internal/tool"
 )
 
 // Agent is the base interface every concrete agent (ChatAgent,

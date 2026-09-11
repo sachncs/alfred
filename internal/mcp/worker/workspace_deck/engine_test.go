@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	alfredtool "github.com/alfred/alfred/internal/tool"
+	alfredtool "github.com/sachncs/alfred/internal/tool"
 )
 
 func createTestPPTX(t *testing.T, dir string) string {

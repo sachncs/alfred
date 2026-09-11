@@ -6,7 +6,7 @@ package testutil
 import (
 	"time"
 
-	"github.com/alfred/alfred/internal/contract"
+	"github.com/sachncs/alfred/internal/contract"
 )
 
 // NewThread returns a fully-populated Thread for tests.

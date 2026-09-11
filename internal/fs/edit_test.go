@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/alfred/alfred/internal/tool"
+	"github.com/sachncs/alfred/internal/tool"
 )
 
 func TestEditToolBasic(t *testing.T) {

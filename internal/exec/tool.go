@@ -9,7 +9,7 @@ import (
 	"os/exec"
 	"time"
 
-	"github.com/alfred/alfred/internal/tool"
+	"github.com/sachncs/alfred/internal/tool"
 )
 
 // BashInput is the JSON schema for BashTool input.

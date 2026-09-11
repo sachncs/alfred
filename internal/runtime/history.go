@@ -1,7 +1,7 @@
 package runtime
 
 import (
-	"github.com/alfred/alfred/internal/contract"
+	"github.com/sachncs/alfred/internal/contract"
 )
 
 // HistoryPruner removes old turns that fall outside the retention window.

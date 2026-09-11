@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"testing"
 
-	alfredtool "github.com/alfred/alfred/internal/tool"
+	alfredtool "github.com/sachncs/alfred/internal/tool"
 )
 
 func TestEvidenceUpdateTool(t *testing.T) {

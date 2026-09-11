@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/alfred/alfred/internal/contract"
+	"github.com/sachncs/alfred/internal/contract"
 )
 
 // MigrateFromJSONL imports legacy JSONL files from srcDir into the hybrid store.

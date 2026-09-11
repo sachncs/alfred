@@ -1,6 +1,6 @@
 package settings
 
-import "github.com/alfred/alfred/internal/contract"
+import "github.com/sachncs/alfred/internal/contract"
 
 // ModelAccessRuntimePolicy is the resolved model access policy.
 type ModelAccessRuntimePolicy struct {

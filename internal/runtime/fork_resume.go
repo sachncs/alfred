@@ -3,7 +3,7 @@ package runtime
 import (
 	"time"
 
-	"github.com/alfred/alfred/internal/contract"
+	"github.com/sachncs/alfred/internal/contract"
 )
 
 // ForkResult is the output of a thread fork.

@@ -9,8 +9,8 @@ import (
 	"strings"
 	"unicode"
 
-	"github.com/alfred/alfred/internal/mcp/worker"
-	"github.com/alfred/alfred/internal/tool"
+	"github.com/sachncs/alfred/internal/mcp/worker"
+	"github.com/sachncs/alfred/internal/tool"
 )
 
 // SequenceRecord represents one sequence from a FASTA file.

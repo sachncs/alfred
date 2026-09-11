@@ -7,8 +7,8 @@ import (
 	"net/url"
 	"testing"
 
-	"github.com/alfred/alfred/internal/contract"
-	"github.com/alfred/alfred/web"
+	"github.com/sachncs/alfred/internal/contract"
+	"github.com/sachncs/alfred/web"
 )
 
 type stubThreads struct {

@@ -6,9 +6,9 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/alfred/alfred/internal/contract"
-	"github.com/alfred/alfred/internal/model"
-	"github.com/alfred/alfred/internal/tool"
+	"github.com/sachncs/alfred/internal/contract"
+	"github.com/sachncs/alfred/internal/model"
+	"github.com/sachncs/alfred/internal/tool"
 )
 
 // TurnLoop drives the agent turn: stream from model, dispatch tool calls,

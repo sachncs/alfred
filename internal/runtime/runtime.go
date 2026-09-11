@@ -7,8 +7,8 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/alfred/alfred/internal/contract"
-	"github.com/alfred/alfred/internal/tool"
+	"github.com/sachncs/alfred/internal/contract"
+	"github.com/sachncs/alfred/internal/tool"
 )
 
 // Runtime is the contract every runtime implementation must satisfy.
