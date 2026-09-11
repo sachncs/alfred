@@ -130,6 +130,10 @@ func (t *delegateTaskTool) Execute(ctx context.Context, raw json.RawMessage, _ *
 
 	child := t.store.create(in.Task, in.AgentType)
 
+	// ponytail: capture the initial status BEFORE spawning the worker so the
+	// success reply does not race with runTask mutating child.Status.
+	initialStatus := child.Status
+
 	// Spawn goroutine to execute the task
 	go t.runTask(child)
 
@@ -137,7 +141,7 @@ func (t *delegateTaskTool) Execute(ctx context.Context, raw json.RawMessage, _ *
 		"taskId":    child.ID,
 		"task":      in.Task,
 		"agentType": in.AgentType,
-		"status":    child.Status,
+		"status":    initialStatus,
 	}), nil
 }
 
