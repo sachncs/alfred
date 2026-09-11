@@ -69,7 +69,7 @@ func NewReadOnlyFileCapability(id ID, path string) *ReadOnlyFileCapability {
 	return &ReadOnlyFileCapability{FileCapability: *NewFileCapability(id, path)}
 }
 
-func (r *ReadOnlyFileCapability) Invoke(_ context.Context, input json.RawMessage) (json.RawMessage, error) {
+func (r *ReadOnlyFileCapability) Invoke(ctx context.Context, input json.RawMessage) (json.RawMessage, error) {
 	var req struct {
 		Op string `json:"op"`
 	}
@@ -79,7 +79,7 @@ func (r *ReadOnlyFileCapability) Invoke(_ context.Context, input json.RawMessage
 	if req.Op == "write" {
 		return nil, fmt.Errorf("readonly_file: write denied for %s", r.id)
 	}
-	return r.FileCapability.Invoke(context.Background(), input)
+	return r.FileCapability.Invoke(ctx, input)
 }
 
 var (
