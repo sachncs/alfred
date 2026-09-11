@@ -29,6 +29,7 @@ func HandleGetSettings(loader SettingsLoader) http.HandlerFunc {
 		settings, err := loader.Load()
 		if err != nil {
 			w.Header().Set("Content-Type", "application/json")
+			w.Header().Set("X-Alfred-Settings-Warning", err.Error())
 			w.WriteHeader(500)
 			_ = json.NewEncoder(w).Encode(contract.Errorf(contract.CodeInternal, err.Error()))
 			return

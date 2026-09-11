@@ -146,6 +146,20 @@ func (m *mockStore) get(namespace, key string) ([]byte, error) {
 	return v, nil
 }
 
+func TestStoreLoadSurfacesParseError(t *testing.T) {
+	store := NewSettingsStore(
+		func(_, _ string) ([]byte, error) {
+			return []byte("not-json"), nil
+		},
+		func(_ string, _ string, _ any) error { return nil },
+		func(_ string, _ string) error { return nil },
+	)
+	_, err := store.Load()
+	if err == nil {
+		t.Fatal("expected parse error to be propagated")
+	}
+}
+
 func (m *mockStore) set(namespace, key string, value any) error {
 	b, err := json.Marshal(value)
 	if err != nil {

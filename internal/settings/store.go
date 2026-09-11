@@ -2,6 +2,7 @@ package settings
 
 import (
 	"encoding/json"
+	"log"
 
 	"github.com/sachncs/alfred/internal/contract"
 )
@@ -25,14 +26,23 @@ func NewSettingsStore(
 }
 
 // Load returns the persisted AppSettingsV1, or defaults if not found.
+// Errors from the storage layer or from JSON parsing are logged and
+// returned to the caller so the user can be told that their saved
+// settings could not be loaded. A missing key (getter returns no data)
+// is not an error: the user simply has no saved settings yet.
 func (s *SettingsStore) Load() (contract.AppSettingsV1, error) {
 	raw, err := s.getter(settingsNamespace, "app_settings")
 	if err != nil {
+		log.Printf("settings: load %s/app_settings: %v", settingsNamespace, err)
+		return DefaultAppSettings(), err
+	}
+	if len(raw) == 0 {
 		return DefaultAppSettings(), nil
 	}
 	var settings contract.AppSettingsV1
 	if err := json.Unmarshal(raw, &settings); err != nil {
-		return DefaultAppSettings(), nil
+		log.Printf("settings: parse %s/app_settings: %v", settingsNamespace, err)
+		return DefaultAppSettings(), err
 	}
 	return Normalize(settings), nil
 }
