@@ -95,27 +95,36 @@ func (h *HybridThreadStore) Delete(id contract.ThreadID) error {
 }
 
 // AppendEvents appends turn items to both SQLite events table and JSONL file.
+//
+// The writes are made durable by ordering JSONL first (write-ahead) and
+// SQLite second. If the JSONL append fails we return immediately; if the
+// SQLite insert fails after a successful JSONL append, the events are
+// still visible via JSONL replay and can be reconciled on the next
+// successful append — the inverse direction is unrecoverable.
 func (h *HybridThreadStore) AppendEvents(threadID contract.ThreadID, items []contract.TurnItem) error {
 	if len(items) == 0 {
 		return nil
 	}
 
-	if _, _, err := h.sqlite.BulkInsertEvents(string(threadID), items); err != nil {
-		return fmt.Errorf("sqlite bulk insert: %w", err)
-	}
-
-	// ponytail: append to JSONL too so legacy readers can replay.
+	// ponytail: append to JSONL first (write-ahead) so legacy readers can
+	// always replay events even if the SQLite write fails afterwards.
 	f, err := os.OpenFile(h.jsonlPath(threadID), os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0o644)
 	if err != nil {
 		return err
 	}
-	defer func() { _ = f.Close() }()
-
 	enc := json.NewEncoder(f)
 	for _, it := range items {
 		if err := enc.Encode(it); err != nil {
+			_ = f.Close()
 			return err
 		}
+	}
+	if err := f.Close(); err != nil {
+		return err
+	}
+
+	if _, _, err := h.sqlite.BulkInsertEvents(string(threadID), items); err != nil {
+		return fmt.Errorf("sqlite bulk insert (jsonl already written): %w", err)
 	}
 	return nil
 }
