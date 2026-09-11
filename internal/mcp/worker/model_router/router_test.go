@@ -31,7 +31,7 @@ func TestTruncateSnippetShort(t *testing.T) {
 }
 
 func TestProxyOpenAIAuthMissing(t *testing.T) {
-	os.Unsetenv("OPENAI_API_KEY")
+	_ = os.Unsetenv("OPENAI_API_KEY")
 	p := &proxyTool{router: &modelRouter{client: http.DefaultClient}}
 	res, err := p.proxyOpenAI(context.Background(), proxyInput{Model: "gpt-4o", Messages: json.RawMessage(`[]`)})
 	if err != nil {
@@ -46,7 +46,7 @@ func TestProxyOpenAIAuthMissing(t *testing.T) {
 }
 
 func TestProxyAnthropicAuthMissing(t *testing.T) {
-	os.Unsetenv("ANTHROPIC_API_KEY")
+	_ = os.Unsetenv("ANTHROPIC_API_KEY")
 	p := &proxyTool{router: &modelRouter{client: http.DefaultClient}}
 	res, err := p.proxyAnthropic(context.Background(), proxyInput{Model: "claude-3-opus", Messages: json.RawMessage(`[]`)})
 	if err != nil {
