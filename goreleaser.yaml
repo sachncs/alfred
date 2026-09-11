@@ -1,0 +1,52 @@
+version: 2
+
+project_name: alfred
+
+before:
+  hooks:
+    - go mod tidy
+
+builds:
+  - id: alfred
+    main: ./cmd/alfred
+    binary: alfred
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
+    flags:
+      - -trimpath
+    ldflags:
+      - -s -w
+
+archives:
+  - formats:
+      - tar.gz
+    name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    files:
+      - LICENSE*
+      - README*
+      - CHANGELOG*
+
+changelog:
+  use: github
+  sort: asc
+  groups:
+    - title: Features
+      regexp: '^.*?feat[(\w)]*:?.*$'
+      order: 0
+    - title: 'Bug fixes'
+      regexp: '^.*?fix[(\w)]*:?.*$'
+      order: 1
+    - title: Others
+      order: 999
+
+release:
+  github:
+    owner: sachncs
+    repo: alfred
+  prerelease: auto
+  draft: false
