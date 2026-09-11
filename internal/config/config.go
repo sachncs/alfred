@@ -18,12 +18,13 @@ type Config struct {
 	DBPath        string
 }
 
-// Defaults returns a Config with production defaults.
+// Defaults returns a Config with production defaults. Version is left
+// empty so callers can populate it from internal/buildinfo.Version.
 func Defaults() Config {
 	home, _ := os.UserHomeDir()
 	return Config{
 		Port:          8899,
-		Version:       "0.3.0-phase3",
+		Version:       "",
 		WorkspaceRoot: ".",
 		DBPath:        filepath.Join(home, ".alfred", "alfred.db"),
 	}

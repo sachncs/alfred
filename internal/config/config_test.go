@@ -3,6 +3,8 @@ package config
 import (
 	"os"
 	"testing"
+
+	"github.com/sachncs/alfred/internal/buildinfo"
 )
 
 func TestDefaults(t *testing.T) {
@@ -13,8 +15,11 @@ func TestDefaults(t *testing.T) {
 	if cfg.WorkspaceRoot != "." {
 		t.Errorf("default workspace root = %q, want \".\"", cfg.WorkspaceRoot)
 	}
-	if cfg.Version == "" {
-		t.Error("default version should not be empty")
+	if cfg.Version != "" {
+		t.Errorf("default version = %q, want empty (caller sets from buildinfo)", cfg.Version)
+	}
+	if buildinfo.Version == "" {
+		t.Error("buildinfo.Version should not be empty")
 	}
 }
 

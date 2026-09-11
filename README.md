@@ -93,14 +93,14 @@ make run      # build + run
 make clean    # remove ./bin/
 ```
 
-## Phase 3 acceptance (verified)
+## Phase 7 acceptance (verified)
 
 ```bash
 $ make build
 Built bin/alfred
 
 $ make test
-... 15 packages, all OK under -race
+... all packages OK under -race
 
 $ make vet
 go vet clean
@@ -109,12 +109,20 @@ $ make lint
 0 issues.
 
 $ ./bin/alfred --port 8899
-2026/07/23 alfred 0.3.0-phase3 starting on port 8899 (db=~/.alfred/alfred.db)
-2026/07/23 mcp worker ready: id=echo-worker tools=1
-2026/07/23 hybrid store ready: sqlite=~/.alfred/alfred.db jsonl=~/.alfred/events
-2026/07/23 chat agent ready: id=alfred.chat tools=3
-2026/07/23 runtime ready
-2026/07/23 ready (Ctrl-C to exit)
+alfred 0.7.0-phase7 starting on port 8899 (db=~/.alfred/alfred.db)
+mcp worker ready: id=echo-worker tools=1
+mcp worker ready: id=mcp.search tools=...
+mcp worker ready: id=mcp.model_router tools=...
+... (25+ workers)
+hybrid store ready: sqlite=~/.alfred/alfred.db jsonl=~/.alfred/events
+settings loaded: theme=dark model=claude-sonnet-4-20250514
+chat agent ready: id=alfred.chat tools=3
+runtime ready
+web ui ready: / and /design
+capability routes ready: GET /v1/capabilities
+settings routes ready: GET/POST/PATCH /v1/settings
+smoke test passed
+ready (Ctrl-C to exit)
 READY
 ```
 
@@ -122,7 +130,7 @@ READY
 
 ```bash
 $ curl http://127.0.0.1:8899/v1/health
-{"status":"ok","version":"0.3.0-phase3","timestamp":"2026-07-23T..."}
+{"status":"ok","version":"0.7.0-phase7","timestamp":"..."}
 ```
 
 ### Create a thread
@@ -201,25 +209,21 @@ curl -X POST "http://127.0.0.1:8899/v1/threads/$THREAD/turns" \
   -d '{"text":"Make a 5-slide deck on transformers."}'
 ```
 
-## What's complete (Phases 1-3)
+## What's complete (through Phase 7)
 
 - **Phase 1**: OOP hierarchy (Tool, Agent, MCPServer, Capability), ChatAgent, EchoServer, binary boot
 - **Phase 2**: HTTP/SSE runtime, turn loop with tool dispatch, compaction, token economy, history hygiene, steering queue, sub-agent delegation, usage tracking, tool budgets, prompt cache, memory store, skills loader, built-in tools (Read/Write/Edit/ApplyPatch/Bash/Grep/Find/Ls), code review, fork/resume, goals/todos, all HTTP routes
 - **Phase 3**: SQLite persistence (pure Go via modernc.org/sqlite), schema migrations, hybrid thread store (SQLite index + JSONL body), retention pruning, JSONL migration, legacy Kun config migration
+- **Phase 4**: Web UI under `/` and `/design` (htmx + Go html/template)
+- **Phase 5**: Capability broker + initial workers (`search`, `model_router`, `plan_gateway`, `write_assist`, `inspector`)
+- **Phase 6**: Settings persistence (`AppSettingsV1`) via SQLite settings table
+- **Phase 7**: Research / content / workspace workers (paper radar, multi-agent, evidence DAG, image generation, scientific plotting, PPT, schedule, workflow, remote executor, workspace previews)
 
 ## What's NOT done yet
 
-Phase 4+ layers on:
+Phase 8+ layers on:
 
-- Web UI (htmx + Go html/template) — Phase 4
-- All 28 MCP workers (search, model-router, plan-gateway, write-assist, etc.) — Phases 5/7
-- Capability broker and resource/file capabilities — Phase 5
-- Settings persistence (AppSettingsV1) — Phase 6
-- Research workers, paper radar, multi-agent — Phase 7a
-- Image generation, scientific plotting, visual documents — Phase 7b
-- Workspace previews — Phase 7c
-- Workflow engine, schedule tasks, remote executor — Phase 7d
-- UX features (plan mode, write mode, anchored comments) — Phase 8
-- Remote channel runtime, cutover from SciForge — Phase 9
+- UX features — plan mode, write mode, anchored comments, multi-thread views — Phase 8
+- Remote channel runtime, cutover from `SciForge` — Phase 9
 
 See [`docs/ROADMAP.md`](./docs/ROADMAP.md) for the full plan and [`docs/workers/`](./docs/workers/README.md) for the per-worker reference.
