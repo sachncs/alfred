@@ -109,6 +109,75 @@ $ curl -X POST http://127.0.0.1:8899/v1/threads -d '{"title":"research"}'
 {"thread":{"id":"...","title":"research","status":"idle",...}}
 ```
 
+## Recipes
+
+Each recipe combines 2+ MCP workers in a single end-to-end flow. Start
+`./bin/alfred --port 8899` first and run the curl block from another shell.
+
+### 1. Research a paper
+
+Prompt: "Summarize arxiv:2401.00001 in 3 bullets and list its top 3 cited works."
+
+Worker chain: `search` → `paper_radar` → `evidence_dag` → `assistant_text`.
+
+```bash
+curl -X POST http://127.0.0.1:8899/v1/threads \
+  -H 'Content-Type: application/json' \
+  -d '{"title":"paper-2401.00001"}'
+
+THREAD=$(curl -s http://127.0.0.1:8899/v1/threads | jq -r '.threads[0].id')
+
+curl -X POST "http://127.0.0.1:8899/v1/threads/$THREAD/turns" \
+  -H 'Content-Type: application/json' \
+  -d '{"text":"Summarize arxiv:2401.00001 in 3 bullets and list its top 3 cited works."}'
+```
+
+Expected output (truncated):
+
+```text
+{"event":"turn.completed","data":{"status":"completed","items":[
+  {"type":"text","text":"- Bullet 1\n- Bullet 2\n- Bullet 3"},
+  {"type":"tool","tool":"paper_radar.paper_search","output":"..."},
+  {"type":"tool","tool":"evidence_dag.evidence_update","output":"..."}
+]}}
+```
+
+### 2. Write a code review
+
+Prompt: "Review `internal/runtime/loop.go` for race conditions and summarize."
+
+Worker chain: `fs_read` → `fs_read` → `assistant_text`.
+
+```bash
+curl -X POST "http://127.0.0.1:8899/v1/threads/$THREAD/turns" \
+  -H 'Content-Type: application/json' \
+  -d '{"text":"Review internal/runtime/loop.go for race conditions."}'
+```
+
+### 3. Generate a figure
+
+Prompt: "Plot a histogram of `x` from `data.csv`."
+
+Worker chain: `fs_read` → `scientific_plotting` → `workspace_tabular`.
+
+```bash
+curl -X POST "http://127.0.0.1:8899/v1/threads/$THREAD/turns" \
+  -H 'Content-Type: application/json' \
+  -d '{"text":"Plot a histogram of column x from data.csv."}'
+```
+
+### 4. Draft a slide deck
+
+Prompt: "Make a 5-slide deck on transformers for a research meeting."
+
+Worker chain: `write_assist` → `ppt_master` → `workspace_deck`.
+
+```bash
+curl -X POST "http://127.0.0.1:8899/v1/threads/$THREAD/turns" \
+  -H 'Content-Type: application/json' \
+  -d '{"text":"Make a 5-slide deck on transformers."}'
+```
+
 ## What's complete (Phases 1-3)
 
 - **Phase 1**: OOP hierarchy (Tool, Agent, MCPServer, Capability), ChatAgent, EchoServer, binary boot
