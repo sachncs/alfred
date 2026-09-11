@@ -14,13 +14,33 @@ func TestURLPolicyIsSafe(t *testing.T) {
 		safe bool
 	}{
 		{"https://example.com", true},
-		{"http://example.com", true},
-		{"mailto:user@example.com", true},
+		{"http://example.com", false},
+		{"mailto:user@example.com", false},
 		{"ftp://example.com", false},
 		{"javascript:alert(1)", false},
 		{"://bad", false},
 		{"", false},
 		{"https://evil.com/steal", true},
+	}
+	for _, tt := range tests {
+		if got := p.IsSafe(tt.url); got != tt.safe {
+			t.Errorf("IsSafe(%q) = %v, want %v", tt.url, got, tt.safe)
+		}
+	}
+}
+
+func TestURLPolicyPermissive(t *testing.T) {
+	p := contract.NewURLPolicyPermissive()
+
+	tests := []struct {
+		url  string
+		safe bool
+	}{
+		{"https://example.com", true},
+		{"http://example.com", true},
+		{"mailto:user@example.com", true},
+		{"ftp://example.com", false},
+		{"javascript:alert(1)", false},
 	}
 	for _, tt := range tests {
 		if got := p.IsSafe(tt.url); got != tt.safe {
